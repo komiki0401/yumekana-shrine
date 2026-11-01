@@ -1,0 +1,96 @@
+import { expect, test, type Page } from '@playwright/test'
+
+async function navigate(page: Page, label: string) {
+  const mobile = await page.locator('.bottom-nav').isVisible()
+  await page.locator(mobile ? '.bottom-nav' : '.desktop-nav').getByRole('button', { name: label, exact: true }).click()
+}
+
+async function enter(page: Page) {
+  await page.goto('./')
+  await page.getByRole('dialog').getByRole('button', { name: '閉じる' }).click()
+}
+
+test('夢の登録・編集・達成確認とリロード後の履歴', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', error => errors.push(error.message))
+  await enter(page)
+  await navigate(page, '絵馬殿')
+  await page.getByRole('button', { name: '最初の絵馬を書く' }).click()
+  await page.getByRole('textbox', { name: '夢のタイトル' }).fill('小さなカフェを開く')
+  await page.getByRole('textbox', { name: '夢の詳細' }).fill('桜の見える場所で')
+  await page.getByRole('button', { name: '願いを込めて、保存する' }).click()
+  await page.getByRole('button', { name: '編集する' }).click()
+  await page.getByRole('textbox', { name: '夢のタイトル' }).fill('桜のカフェを開く')
+  await page.getByRole('button', { name: '願いを込めて、保存する' }).click()
+  await page.getByRole('button', { name: '夢が叶った！' }).click()
+  await page.getByRole('button', { name: 'まだ願い中にしておく' }).click()
+  await expect(page.locator('.ema')).toHaveCount(1)
+  await page.getByRole('button', { name: '夢が叶った！' }).click()
+  await page.getByRole('textbox', { name: '今の気持ちをひとこと' }).fill('ありがとう、自分。')
+  await page.getByRole('button', { name: '夢が叶ったことを記録する' }).click()
+  await page.getByRole('button', { name: '演出をスキップ' }).click()
+  await page.reload()
+  await navigate(page, 'あゆみ')
+  await expect(page.getByRole('heading', { name: '桜のカフェを開く' })).toBeVisible()
+  await expect(page.locator('.timeline')).toContainText('ありがとう、自分。')
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  expect(errors).toEqual([])
+})
+
+test('3目標の上限・小判の整合性・おみくじの日次保存', async ({ page }) => {
+  await enter(page)
+  await navigate(page, '今日の目標')
+  for (const title of ['10分散歩する', 'ありがとうを伝える', '本を1ページ読む']) {
+    await page.getByLabel('小さな目標を追加').fill(title)
+    await page.getByRole('button', { name: '追加', exact: true }).click()
+  }
+  await expect(page.locator('.goal-form')).toHaveCount(0)
+  const goal = page.getByRole('checkbox', { name: '10分散歩する' })
+  await goal.check()
+  await expect(page.locator('.coin-pill b')).toHaveText('1')
+  await goal.uncheck()
+  await expect(page.locator('.coin-pill b')).toHaveText('0')
+  await goal.check()
+  await page.locator('.coin-pill').click()
+  await page.getByRole('button', { name: '小判1枚を奉納する' }).click()
+  await page.getByRole('button', { name: '演出をスキップ' }).click()
+  await expect(page.locator('.coin-pill b')).toHaveText('0')
+  await expect(page.getByRole('button', { name: '小判1枚を奉納する' })).toBeDisabled()
+  await navigate(page, '今日の目標')
+  await goal.click()
+  await expect(goal).toBeChecked()
+  await expect(page.getByRole('status')).toContainText('奉納済み')
+  await navigate(page, 'おみくじ')
+  await page.getByRole('button', { name: 'おみくじを引く · 無料' }).click()
+  const result = await page.locator('.fortune-paper').textContent()
+  await page.reload()
+  await navigate(page, 'おみくじ')
+  await expect(page.locator('.fortune-paper')).toHaveText(result!)
+})
+
+test('起動中の日付変更で新しい目標とおみくじを用意し過去を残す', async ({ page }) => {
+  await page.clock.install({ time: new Date(2026, 11, 31, 23, 59, 55) })
+  await enter(page)
+  await navigate(page, '今日の目標')
+  await page.getByLabel('小さな目標を追加').fill('年末の小さな一歩')
+  await page.getByRole('button', { name: '追加', exact: true }).click()
+  await navigate(page, 'おみくじ')
+  await page.getByRole('button', { name: 'おみくじを引く · 無料' }).click()
+  await page.clock.fastForward(15000)
+  await expect(page.getByRole('button', { name: 'おみくじを引く · 無料' })).toBeVisible()
+  await navigate(page, '今日の目標')
+  await expect(page.getByRole('heading', { name: '2027 / 01 / 01' })).toBeVisible()
+  await expect(page.getByRole('checkbox')).toHaveCount(0)
+  await navigate(page, 'あゆみ')
+  await expect(page.locator('.day-history summary')).toContainText('2026-12-31')
+})
+
+test('破損した保存データを上書きせずに起動できる', async ({ page }) => {
+  await page.goto('./')
+  await page.evaluate(() => localStorage.setItem('yumekana-shrine:v1', '{broken'))
+  await page.reload()
+  await expect(page.getByRole('alert')).toContainText('元のデータは上書きしません')
+  await page.getByRole('dialog').getByRole('button', { name: '閉じる' }).click()
+  await page.getByRole('button', { name: '音声を有効にする' }).click()
+  expect(await page.evaluate(() => localStorage.getItem('yumekana-shrine:v1'))).toBe('{broken')
+})
