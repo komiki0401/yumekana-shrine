@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Heart, Sparkles } from 'lucide-react'
 import type { Dream, Gratitude, Spirit } from './store'
 import { id, localDate } from './store'
+import { spiritTotal } from './encounters'
 
 export function GratitudePage({ entries, spirit, text, onText, linkedDream, onUnlink, onRecord, onVisit }: {
  entries: Gratitude[]; spirit: Spirit; text: string; onText: (text: string) => void
@@ -23,7 +24,7 @@ export function GratitudePage({ entries, spirit, text, onText, linkedDream, onUn
    <section className="spirit-panel" aria-label="感謝と期待の積み重ね">
     <div><span className="spirit-orb gratitude-orb"><Heart size={23}/></span><span><small>感謝度</small><strong>{spirit.gratitude}</strong><em>気づいた、ありがとう。</em></span></div>
     <div><span className="spirit-orb expectation-orb"><Sparkles size={23}/></span><span><small>期待度</small><strong>{spirit.expectation}</strong><em>思い描いた、これから。</em></span></div>
-    <p>数字は減りません。あなたのペースで、少しずつ。<br/>感謝と期待が育つと、境内で小さな出会いがあるかもしれません。</p>
+    <div className="spirit-total"><span>感謝度 ＋ 期待度</span><b>{spiritTotal(spirit)}</b><small>合計の数値で、境内の出会いが増えていきます。</small></div><p>数字は減りません。あなたのペースで、少しずつ。<br/>感謝からでも、夢からでも。境内に小さな彩りが育ちます。</p>
    </section>
    <section className={'content-card gratitude-writing' + (celebrating ? ' gratitude-celebrating' : '')}>
     <p className="eyebrow"><Heart size={14}/> THANK YOU, TODAY</p><h2>今日のありがとう</h2>

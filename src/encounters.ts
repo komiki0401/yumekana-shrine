@@ -9,18 +9,29 @@ export const encounterCatalog: Record<EncounterKind, { symbol: string; title: st
  miracle: { symbol: '🌈', title: '感謝と期待が結ぶ、小さな奇跡', message: '虹色の光に包まれて、神さまがそっと微笑みました。' },
 }
 
-// One draw per visit / minute. Even at high values, a quiet visit remains possible.
-// Thresholds and weights are independent from the saved, ever-growing values.
+// All unlocks depend only on the combined value. The old 20 + 20 condition
+// becomes a total of 40, so either gratitude or dreams can unlock the miracle.
+export const encounterThresholds: Record<EncounterKind, number> = {
+ cat: 1, blossoms: 3, butterfly: 5, shootingStar: 3, deity: 8, miracle: 40,
+}
+export const ENCOUNTER_RATE_MULTIPLIER = 3
+export const MAX_ENCOUNTER_RATE = .95
+export const spiritTotal = (spirit: Spirit) => Math.max(0, spirit.gratitude) + Math.max(0, spirit.expectation)
+
 export function encounterWeights(spirit: Spirit): { kind: EncounterKind; weight: number }[] {
- const g = Math.max(0, spirit.gratitude), e = Math.max(0, spirit.expectation)
- return [
-  { kind: 'miracle', weight: g >= 20 && e >= 20 ? Math.min(.012, .003 + Math.min(g,e) * .0001) : 0 },
-  { kind: 'deity', weight: e >= 8 ? Math.min(.05, .006 + e * .0005) : 0 },
-  { kind: 'shootingStar', weight: e >= 3 ? Math.min(.15, .025 + e * .002) : 0 },
-  { kind: 'butterfly', weight: g >= 5 ? Math.min(.14, .025 + g * .002) : 0 },
-  { kind: 'blossoms', weight: g >= 3 ? Math.min(.14, .025 + g * .002) : 0 },
-  { kind: 'cat', weight: g >= 1 ? Math.min(.24, .04 + g * .006) : 0 },
+ const total = spiritTotal(spirit)
+ const base: { kind: EncounterKind; weight: number }[] = [
+  { kind: 'miracle', weight: total >= encounterThresholds.miracle ? Math.min(.012, .003 + total / 2 * .0001) : 0 },
+  { kind: 'deity', weight: total >= encounterThresholds.deity ? Math.min(.05, .006 + total * .0005) : 0 },
+  { kind: 'shootingStar', weight: total >= encounterThresholds.shootingStar ? Math.min(.15, .025 + total * .002) : 0 },
+  { kind: 'butterfly', weight: total >= encounterThresholds.butterfly ? Math.min(.14, .025 + total * .002) : 0 },
+  { kind: 'blossoms', weight: total >= encounterThresholds.blossoms ? Math.min(.14, .025 + total * .002) : 0 },
+  { kind: 'cat', weight: total >= encounterThresholds.cat ? Math.min(.24, .04 + total * .006) : 0 },
  ]
+ const baseRate = base.reduce((sum, entry) => sum + entry.weight, 0)
+ // Multiply every eligible rate equally; retain relative rarity at the cap.
+ const scale = baseRate ? Math.min(ENCOUNTER_RATE_MULTIPLIER, MAX_ENCOUNTER_RATE / baseRate) : 0
+ return base.map(entry => ({ ...entry, weight: entry.weight * scale }))
 }
 
 export function rollEncounter(spirit: Spirit, random = Math.random): EncounterKind | null {

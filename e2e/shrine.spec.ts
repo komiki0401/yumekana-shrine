@@ -256,7 +256,7 @@ test('境内の超レア演出は保存され、別ページでは抽選しな�
   await page.evaluate(() => {
     const key = 'yumekana-shrine:v1'
     const data = JSON.parse(localStorage.getItem(key)!)
-    data.spirit = {gratitude:25,expectation:25}
+    data.spirit = {gratitude:0,expectation:40}
     localStorage.setItem(key,JSON.stringify(data))
   })
   await page.addInitScript(() => { Math.random = () => 0 })
@@ -269,6 +269,7 @@ test('境内の超レア演出は保存され、別ページでは抽選しな�
   await navigate(page, 'お礼参り')
   await page.clock.fastForward(120000)
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('yumekana-shrine:v1')!).encounters.length)).toBe(1)
-  await expect(page.locator('.spirit-panel strong').first()).toHaveText('25')
-  await expect(page.locator('.spirit-panel strong').nth(1)).toHaveText('25')
+  await expect(page.locator('.spirit-panel strong').first()).toHaveText('0')
+  await expect(page.locator('.spirit-panel strong').nth(1)).toHaveText('40')
+  await expect(page.locator('.spirit-total b')).toHaveText('40')
 })

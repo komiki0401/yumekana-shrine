@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { addSuggestedDream, decode, empty, fulfillDream, recordEncounter, recordGratitude, registerDream } from './store'
-import { encounterWeights, rollEncounter } from './encounters'
+import { encounterWeights, rollEncounter, encounterThresholds, spiritTotal } from './encounters'
 import { dreamGenres } from './dreamCatalog'
 
 const dream = { id: 'dream', title: '美味しいご飯', detail: '', target: '', createdAt: '2026-11-02', status: 'wishing' as const }
@@ -54,22 +54,48 @@ describe('お礼参りと期待度', () => {
 })
 
 describe('境内の特別演出', () => {
- it('出会いのない静かな訪問も残し、値が上がると確率が下がらない', () => {
-  expect(rollEncounter({gratitude:0,expectation:0},()=>0)).toBeNull()
-  expect(rollEncounter({gratitude:1,expectation:0},()=>0)).toBe('cat')
-  expect(rollEncounter({gratitude:0,expectation:3},()=>0)).toBe('shootingStar')
-  expect(rollEncounter({gratitude:0,expectation:8},()=>0)).toBe('deity')
-  const low = encounterWeights({gratitude:10,expectation:10})
-  const high = encounterWeights({gratitude:100,expectation:100})
-  expect(high.every((entry,i) => entry.weight >= low[i].weight)).toBe(true)
-  expect(high.reduce((sum,entry)=>sum+entry.weight,0)).toBeLessThan(1)
-  expect(rollEncounter({gratitude:100000,expectation:100000},()=>.999)).toBeNull()
+ it('同じ合計なら感謝と期待の内訳に関係なく同じ抽選になる', () => {
+  expect(spiritTotal({gratitude:12,expectation:8})).toBe(20)
+  expect(encounterWeights({gratitude:20,expectation:0})).toEqual(encounterWeights({gratitude:0,expectation:20}))
+  expect(encounterWeights({gratitude:12,expectation:8})).toEqual(encounterWeights({gratitude:20,expectation:0}))
  })
- it('超レアは両方20以上のときだけ候補に入る', () => {
-  for (const spirit of [{gratitude:100,expectation:19},{gratitude:19,expectation:100}]) {
-   expect(encounterWeights(spirit).find(entry => entry.kind === 'miracle')?.weight).toBe(0)
+ it('合計の閾値でそれぞれの演出を解放する', () => {
+  for (const [kind, threshold] of Object.entries(encounterThresholds)) {
+   expect(encounterWeights({gratitude:0,expectation:threshold-1}).find(entry=>entry.kind===kind)?.weight).toBe(0)
+   expect(encounterWeights({gratitude:threshold,expectation:0}).find(entry=>entry.kind===kind)?.weight).toBeGreaterThan(0)
   }
-  expect(rollEncounter({gratitude:20,expectation:20},()=>0)).toBe('miracle')
+  expect(rollEncounter({gratitude:0,expectation:0},()=>0)).toBeNull()
+  expect(rollEncounter({gratitude:0,expectation:1},()=>0)).toBe('cat')
+  expect(rollEncounter({gratitude:8,expectation:0},()=>0)).toBe('deity')
+ })
+ it('上限に届くまでは基準確率を正確に3倍にする', () => {
+  const one = encounterWeights({gratitude:0,expectation:1})
+  expect(one.find(entry=>entry.kind==='cat')?.weight).toBeCloseTo((.04 + .006) * 3)
+  const five = encounterWeights({gratitude:2,expectation:3})
+  expect(five.find(entry=>entry.kind==='cat')?.weight).toBeCloseTo((.04 + 5*.006) * 3)
+  for (const kind of ['blossoms','butterfly','shootingStar']) {
+   expect(five.find(entry=>entry.kind===kind)?.weight).toBeCloseTo((.025 + 5*.002) * 3)
+  }
+ })
+ it('高い合計でも全体95%を上限とし、レア度の比率を保つ', () => {
+  const high = encounterWeights({gratitude:10000,expectation:10000})
+  expect(high.reduce((sum,entry)=>sum+entry.weight,0)).toBeCloseTo(.95)
+  const cat = high.find(entry=>entry.kind==='cat')!.weight
+  const miracle = high.find(entry=>entry.kind==='miracle')!.weight
+  expect(cat / miracle).toBeCloseTo(.24 / .012)
+  expect(rollEncounter({gratitude:10000,expectation:10000},()=>.999)).toBeNull()
+  let previous = 0
+  for (let total=0;total<=200;total++) {
+   const rate = encounterWeights({gratitude:total,expectation:0}).reduce((sum,entry)=>sum+entry.weight,0)
+   expect(rate).toBeGreaterThanOrEqual(previous - 1e-12)
+   expect(rate).toBeLessThanOrEqual(.95 + 1e-12)
+   previous = rate
+  }
+ })
+ it('超レアは合計40以上なら、片方の数値が0でも候補に入る', () => {
+  expect(encounterWeights({gratitude:39,expectation:0}).find(entry=>entry.kind==='miracle')?.weight).toBe(0)
+  expect(rollEncounter({gratitude:40,expectation:0},()=>0)).toBe('miracle')
+  expect(rollEncounter({gratitude:0,expectation:40},()=>0)).toBe('miracle')
  })
  it('出会いを重複なく保存し、感謝度と期待度は消費しない', () => {
   const d = recordGratitude(registerDream(empty(), dream), thanks)
