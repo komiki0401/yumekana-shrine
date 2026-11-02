@@ -224,3 +224,13 @@ export const dreamGenres: DreamGenre[] = [
 ]
 
 export const suggestionCount = dreamGenres.reduce((count, genre) => count + genre.suggestions.length, 0)
+
+// The original 20 everyday wishes share the catalog IDs with the genre explorer.
+const smallDreamIds = new Set([
+  'happiness-001', 'happiness-002', 'happiness-003', 'happiness-004',
+  'travel-001', 'happiness-005', 'happiness-006', 'happiness-007',
+  'happiness-008', 'happiness-009', 'happiness-010', 'happiness-011',
+  'hobbies-001', 'happiness-012', 'happiness-013', 'happiness-014',
+  'happiness-015', 'wellbeing-001', 'happiness-016', 'happiness-017',
+])
+export const smallDreamSuggestions = dreamGenres.flatMap(genre => genre.suggestions).filter(item => smallDreamIds.has(item.id))

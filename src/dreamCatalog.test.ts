@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dreamGenres, suggestionCount } from './dreamCatalog'
+import { dreamGenres, suggestionCount, smallDreamSuggestions } from './dreamCatalog'
 import { addSuggestedDream, decode, empty, hasSuggestedDream } from './store'
 
 const expectedCounts: Record<string, number> = {
@@ -47,4 +47,13 @@ describe('ジャンル別の夢の候補', () => {
   expect(hasSuggestedDream(original.dreams, suggestion)).toBe(true)
   expect(addSuggestedDream(original, suggestion, '2026-11-02')).toBe(original)
  })
+})
+
+
+it('初期の20候補は同じ200候補のIDを共有する', () => {
+ expect(smallDreamSuggestions).toHaveLength(20)
+ expect(new Set(smallDreamSuggestions.map(item => item.id)).size).toBe(20)
+ const all = dreamGenres.flatMap(genre => genre.suggestions)
+ expect(smallDreamSuggestions.every(item => all.includes(item))).toBe(true)
+ expect(smallDreamSuggestions.map(item => item.title)).toContain('美味しいご飯を食べる')
 })
