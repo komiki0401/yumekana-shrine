@@ -45,6 +45,7 @@ test('叶えた夢のシャボン玉・思い出・小判が保存される', as
   await navigate(page, '叶えた夢リスト')
   await expect(page.getByRole('heading', { name: '叶った夢が、ここに浮かびます。' })).toBeVisible()
   await page.getByRole('button', { name: '絵馬殿で夢を見つける' }).click()
+  await page.getByRole('button', { name: '小さな幸せ 30の夢', exact: true }).click()
   const title = (await page.locator('.suggestion-list button').first().innerText()).trim()
   await page.locator('.suggestion-list button').first().click()
   await page.locator('.ema-open').first().click()
@@ -111,26 +112,55 @@ test('破損した保存データを上書きせずに起動できる', async ({
   expect(await page.evaluate(() => localStorage.getItem('yumekana-shrine:v1'))).toBe('{broken')
 })
 
-test('ランダムな夢候補を入れ替えて絵馬に登録し保存できる', async ({ page }) => {
+test('9ジャンルの200候補を探し、追加・重複防止・再読み込みできる', async ({ page }, testInfo) => {
   await enter(page)
   await navigate(page, '絵馬殿')
-  const candidates = page.locator('.suggestion-list button')
-  await expect(candidates).toHaveCount(4)
-  const before = await candidates.allTextContents()
-  expect(new Set(before).size).toBe(4)
-  await page.getByRole('button', { name: '別の候補を見る' }).click()
-  const after = await candidates.allTextContents()
-  expect(after.every(title => !before.includes(title))).toBe(true)
-  const chosen = (await candidates.first().innerText()).trim()
-  await candidates.first().click()
-  await expect(page.locator('.ema').getByRole('heading', { name: chosen, exact: true })).toBeVisible()
-  await expect(candidates).toHaveCount(4)
-  expect(await candidates.allTextContents()).not.toContain(chosen)
+  await expect(page.locator('.genre-card')).toHaveCount(9)
+  await expect(page.locator('.suggestion-list button')).toHaveCount(0)
+  const genres = [
+    ['小さな幸せ', 30, '美味しいご飯を食べる'],
+    ['旅行・おでかけ', 25, 'きれいな景色を見に行く'],
+    ['恋愛・人間関係', 20, '大切な人と手をつないで散歩する'],
+    ['美容・健康', 20, '好きな服を着て出かける'],
+    ['仕事・成長', 20, '興味のある分野の話を聞きに行く'],
+    ['お金・豊かさ', 20, '旅のための貯金箱を用意する'],
+    ['趣味・遊び', 25, '新しい料理を作ってみる'],
+    ['暮らし', 20, 'お気に入りの花を一輪飾る'],
+    ['新しい挑戦', 20, '初めての場所へ一人で出かける'],
+  ] as const
+  for (const [label, count, title] of genres) {
+    const genre = page.getByRole('button', { name: `${label} ${count}の夢`, exact: true })
+    await genre.click()
+    await expect(genre).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.locator('.suggestion-list button')).toHaveCount(8)
+    await expect(page.locator('.suggestion-list button').first()).toContainText(title)
+    await page.getByRole('button', { name: 'もっと見る', exact: true }).click()
+    await expect(page.locator('.suggestion-list button')).toHaveCount(16)
+    while (await page.getByRole('button', { name: 'もっと見る', exact: true }).count()) {
+      await page.getByRole('button', { name: 'もっと見る', exact: true }).click()
+    }
+    await expect(page.locator('.suggestion-list button')).toHaveCount(count)
+  }
+  await page.getByRole('button', { name: '小さな幸せ 30の夢', exact: true }).click()
+  const candidate = page.locator('.suggestion-list button').first()
+  const chosen = (await candidate.innerText()).trim()
+  await candidate.click()
+  await expect(candidate).toBeDisabled()
+  await expect(candidate).toContainText('絵馬に追加済み')
+  await expect(page.locator('.ema')).toHaveCount(1)
+  await expect(page.locator('.ema h2')).toHaveText(chosen)
   await page.reload()
   await navigate(page, '絵馬殿')
-  await expect(page.locator('.ema').getByRole('heading', { name: chosen, exact: true })).toBeVisible()
-  expect(await candidates.allTextContents()).not.toContain(chosen)
+  await expect(page.locator('.ema h2')).toHaveText(chosen)
+  await page.getByText('夢の候補から選ぶ', { exact: false }).click()
+  await page.getByRole('button', { name: '小さな幸せ 30の夢', exact: true }).click()
+  await expect(page.locator('.suggestion-list button').first()).toBeDisabled()
+  if (testInfo.project.name === 'mobile-chromium') await page.setViewportSize({width: 320, height: 760})
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  const cards = await page.locator('.genre-card').evaluateAll(items => items.map(item => {const r=item.getBoundingClientRect();return {top:r.top,width:r.width,height:r.height}}))
+  expect(cards.filter(card => Math.abs(card.top - cards[0].top) < 1)).toHaveLength(3)
+  expect(cards.every(card => card.width >= 44 && card.height >= 44)).toBe(true)
+  await page.screenshot({ path: testInfo.outputPath('dream-genres.png'), fullPage: true })
 })
 
 test('絵馬掛けに小さな絵馬を並べ、詳細から編集できる', async ({ page }, testInfo) => {

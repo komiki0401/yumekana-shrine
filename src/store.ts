@@ -1,4 +1,5 @@
-export type Dream = { id: string; title: string; detail: string; createdAt: string; target: string; status: 'wishing' | 'fulfilled'; achievedAt?: string; message?: string }
+import type { DreamSuggestion } from './dreamCatalog'
+export type Dream = { id: string; suggestionId?: string; title: string; detail: string; createdAt: string; target: string; status: 'wishing' | 'fulfilled'; achievedAt?: string; message?: string }
 export type Goal = { id: string; title: string; done: boolean }
 export type Transaction = { id: string; date: string; amount: number; kind: 'earn' | 'undo' | 'offer'; goalId?: string; dreamId?: string }
 export type Fortune = { id: string; rank: string; message: string; action: string; color: string }
@@ -11,7 +12,7 @@ export const balance = (d: Data) => d.transactions.reduce((n, t) => n + t.amount
 export function decode(raw: string): Data {
  const d = JSON.parse(raw)
  const str = (v: unknown) => typeof v === 'string'
- if (d?.version !== 1 || !Array.isArray(d.dreams) || !d.dreams.every((x: Dream) => x && [x.id,x.title,x.detail,x.createdAt,x.target].every(str) && ['wishing','fulfilled'].includes(x.status) && (x.achievedAt === undefined || str(x.achievedAt)) && (x.message === undefined || str(x.message))) || !d.dailyGoals || typeof d.dailyGoals !== 'object' || Array.isArray(d.dailyGoals) || !Object.values(d.dailyGoals).every(v => Array.isArray(v) && v.length <= 3 && v.every(x => x && str(x.id) && str(x.title) && typeof x.done === 'boolean')) || !Array.isArray(d.transactions) || !d.transactions.every((x: Transaction) => x && str(x.id) && str(x.date) && [-1,1].includes(x.amount) && ['earn','undo','offer'].includes(x.kind) && (x.kind === 'earn' ? x.amount === 1 : x.amount === -1)) || !d.fortunes || typeof d.fortunes !== 'object' || Array.isArray(d.fortunes) || !Object.values(d.fortunes).every(v => v && typeof v === 'object' && ['id','rank','message','action','color'].every(k => str((v as Record<string, unknown>)[k]))) || !d.settings || !str(d.settings.id) || typeof d.settings.sound !== 'boolean' || typeof d.settings.welcomed !== 'boolean' || balance(d) < 0) throw new Error('保存データの形式を確認できませんでした')
+ if (d?.version !== 1 || !Array.isArray(d.dreams) || !d.dreams.every((x: Dream) => x && [x.id,x.title,x.detail,x.createdAt,x.target].every(str) && ['wishing','fulfilled'].includes(x.status) && (x.achievedAt === undefined || str(x.achievedAt)) && (x.message === undefined || str(x.message)) && (x.suggestionId === undefined || str(x.suggestionId))) || !d.dailyGoals || typeof d.dailyGoals !== 'object' || Array.isArray(d.dailyGoals) || !Object.values(d.dailyGoals).every(v => Array.isArray(v) && v.length <= 3 && v.every(x => x && str(x.id) && str(x.title) && typeof x.done === 'boolean')) || !Array.isArray(d.transactions) || !d.transactions.every((x: Transaction) => x && str(x.id) && str(x.date) && [-1,1].includes(x.amount) && ['earn','undo','offer'].includes(x.kind) && (x.kind === 'earn' ? x.amount === 1 : x.amount === -1)) || !d.fortunes || typeof d.fortunes !== 'object' || Array.isArray(d.fortunes) || !Object.values(d.fortunes).every(v => v && typeof v === 'object' && ['id','rank','message','action','color'].every(k => str((v as Record<string, unknown>)[k]))) || !d.settings || !str(d.settings.id) || typeof d.settings.sound !== 'boolean' || typeof d.settings.welcomed !== 'boolean' || balance(d) < 0) throw new Error('保存データの形式を確認できませんでした')
  return d
 }
 export function toggleGoal(d: Data, date: string, goalId: string): Data {
@@ -41,4 +42,15 @@ export function fulfillDream(d: Data, dreamId: string, date: string, message: st
  const dream = d.dreams.find(item => item.id === dreamId)
  if (!dream || dream.status === 'fulfilled') return d
  return { ...d, dreams: d.dreams.map(item => item.id === dreamId ? { ...item, status: 'fulfilled', achievedAt: date, message } : item), transactions: [...d.transactions, { id: id(), date, amount: 1, kind: 'earn', dreamId }] }
+}
+
+const normalizeDreamTitle = (title: string) => title.normalize('NFKC').replace(/\s+/g, '').replace(/[。.!！?？]+$/, '')
+
+export function hasSuggestedDream(dreams: Dream[], suggestion: DreamSuggestion): boolean {
+ return dreams.some(dream => dream.status === 'wishing' && (dream.suggestionId === suggestion.id || normalizeDreamTitle(dream.title) === normalizeDreamTitle(suggestion.title)))
+}
+
+export function addSuggestedDream(d: Data, suggestion: DreamSuggestion, date: string): Data {
+ if (hasSuggestedDream(d.dreams, suggestion)) return d
+ return { ...d, dreams: [...d.dreams, { id: id(), suggestionId: suggestion.id, title: suggestion.title, detail: '', target: '', createdAt: date, status: 'wishing' }] }
 }
