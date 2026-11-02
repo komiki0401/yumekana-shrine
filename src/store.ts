@@ -1,3 +1,5 @@
+import { gratitudeChoices, composeGratitude } from './gratitudeChoices'
+import type { GratitudeChoice } from './gratitudeChoices'
 import { isAnimatedMiracle, resolveMiracleId } from './miracleCatalog'
 import type { MiracleId } from './miracleCatalog'
 import type { DreamSuggestion } from './dreamCatalog'
@@ -5,27 +7,30 @@ export type Dream = { id: string; suggestionId?: string; title: string; detail: 
 export type Goal = { id: string; title: string; done: boolean }
 export type Transaction = { id: string; date: string; amount: number; kind: 'earn' | 'undo' | 'offer'; goalId?: string; dreamId?: string }
 export type Fortune = { id: string; rank: string; message: string; action: string; color: string }
-export type Gratitude = { id: string; text: string; date: string; createdAt: string; dreamId?: string }
+export type Gratitude = { id: string; text: string; date: string; createdAt: string; dreamId?: string; selectedThanks?: GratitudeChoice[]; freeText?: string; pointsAwarded?: 0 | 1 }
 export type Spirit = { gratitude: number; expectation: number }
 export type EncounterKind = MiracleId | 'miracle'
 export type Encounter = { id: string; kind: EncounterKind; date: string; createdAt: string }
-export type Data = { version: 1; spiritCredits: {dreams:string[];gratitudes:string[]}; gratitudes: Gratitude[]; spirit: Spirit; encounters: Encounter[]; dreams: Dream[]; dailyGoals: Record<string, Goal[]>; transactions: Transaction[]; fortunes: Record<string, Fortune>; settings: { id: string; sound: boolean; welcomed: boolean } }
+export type Data = { version: 1; spiritCredits: {dreams:string[];gratitudes:string[];gratitudeDays:Record<string,number>}; gratitudes: Gratitude[]; spirit: Spirit; encounters: Encounter[]; dreams: Dream[]; dailyGoals: Record<string, Goal[]>; transactions: Transaction[]; fortunes: Record<string, Fortune>; settings: { id: string; sound: boolean; welcomed: boolean } }
 export const KEY = 'yumekana-shrine:v1'
 export const id = () => crypto.randomUUID()
 export const localDate = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-export const empty = (): Data => ({ version: 1, spiritCredits:{dreams:[],gratitudes:[]}, gratitudes: [], spirit: { gratitude: 0, expectation: 0 }, encounters: [], dreams: [], dailyGoals: {}, transactions: [], fortunes: {}, settings: { id: id(), sound: false, welcomed: false } })
+export const empty = (): Data => ({ version: 1, spiritCredits:{dreams:[],gratitudes:[],gratitudeDays:{}}, gratitudes: [], spirit: { gratitude: 0, expectation: 0 }, encounters: [], dreams: [], dailyGoals: {}, transactions: [], fortunes: {}, settings: { id: id(), sound: false, welcomed: false } })
 export const balance = (d: Data) => d.transactions.reduce((n, t) => n + t.amount, 0)
 export function decode(raw: string): Data {
  const d = JSON.parse(raw)
  const str = (v: unknown) => typeof v === 'string'
  if (d?.version !== 1 || !Array.isArray(d.dreams) || !d.dreams.every((x: Dream) => x && [x.id,x.title,x.detail,x.createdAt,x.target].every(str) && ['wishing','fulfilled'].includes(x.status) && (x.achievedAt === undefined || str(x.achievedAt)) && (x.message === undefined || str(x.message)) && (x.suggestionId === undefined || str(x.suggestionId))) || !d.dailyGoals || typeof d.dailyGoals !== 'object' || Array.isArray(d.dailyGoals) || !Object.values(d.dailyGoals).every(v => Array.isArray(v) && v.length <= 3 && v.every(x => x && str(x.id) && str(x.title) && typeof x.done === 'boolean')) || !Array.isArray(d.transactions) || !d.transactions.every((x: Transaction) => x && str(x.id) && str(x.date) && [-1,1].includes(x.amount) && ['earn','undo','offer'].includes(x.kind) && (x.kind === 'earn' ? x.amount === 1 : x.amount === -1)) || !d.fortunes || typeof d.fortunes !== 'object' || Array.isArray(d.fortunes) || !Object.values(d.fortunes).every(v => v && typeof v === 'object' && ['id','rank','message','action','color'].every(k => str((v as Record<string, unknown>)[k]))) || !d.settings || !str(d.settings.id) || typeof d.settings.sound !== 'boolean' || typeof d.settings.welcomed !== 'boolean' || balance(d) < 0) throw new Error('保存データの形式を確認できませんでした')
  // Additive migration: v1 data from before gratitude keeps every existing record.
- if (d.gratitudes !== undefined && (!Array.isArray(d.gratitudes) || !d.gratitudes.every((g: Gratitude) => g && [g.id,g.text,g.date,g.createdAt].every(str) && (g.dreamId === undefined || str(g.dreamId))))) throw new Error('ありがとうの記録を読み込めませんでした')
+ if (d.gratitudes !== undefined && (!Array.isArray(d.gratitudes) || !d.gratitudes.every((g: Gratitude) => g && [g.id,g.text,g.date,g.createdAt].every(str) && (g.dreamId === undefined || str(g.dreamId)) && (g.freeText === undefined || str(g.freeText)) && (g.pointsAwarded === undefined || g.pointsAwarded === 0 || g.pointsAwarded === 1) && (g.selectedThanks === undefined || (Array.isArray(g.selectedThanks) && g.selectedThanks.length <= 100 && g.selectedThanks.every(choice => choice && [choice.id,choice.label,choice.sentence].every(str))))))) throw new Error('ありがとうの記録を読み込めませんでした')
  if (d.spirit !== undefined && (!d.spirit || ![d.spirit.gratitude,d.spirit.expectation].every(n => Number.isSafeInteger(n) && n >= 0))) throw new Error('感謝度・期待度を読み込めませんでした')
  if (d.encounters !== undefined && (!Array.isArray(d.encounters) || !d.encounters.every((e: Encounter) => e && [e.id,e.date,e.createdAt].every(str) && Boolean(resolveMiracleId(e.kind))))) throw new Error('境内の記録を読み込めませんでした')
  if(d.spiritCredits!==undefined&&(!d.spiritCredits||!Array.isArray(d.spiritCredits.dreams)||!d.spiritCredits.dreams.every(str)||!Array.isArray(d.spiritCredits.gratitudes)||!d.spiritCredits.gratitudes.every(str)))throw new Error('積み重ねの記録を読み込めませんでした')
+ if(d.spiritCredits?.gratitudeDays!==undefined&&(!d.spiritCredits.gratitudeDays||typeof d.spiritCredits.gratitudeDays!=='object'||Array.isArray(d.spiritCredits.gratitudeDays)||!Object.values(d.spiritCredits.gratitudeDays).every(n=>Number.isInteger(n)&&Number(n)>=0&&Number(n)<=3)))throw new Error('毎日の積み重ねを読み込めませんでした')
  const gratitudes:Gratitude[]=d.gratitudes??[]
- return {...d,gratitudes,encounters:d.encounters??[],spirit:{gratitude:d.spirit?.gratitude??gratitudes.length,expectation:d.spirit?.expectation??d.dreams.length},spiritCredits:{dreams:d.spiritCredits?.dreams??[...new Set(d.dreams.flatMap(dreamCreditKeys))],gratitudes:d.spiritCredits?.gratitudes??[...new Set(gratitudes.map(gratitudeCreditKey))]}}
+ const migratedDays=migrateGratitudeDays(gratitudes,d.spiritCredits?.gratitudes??[])
+ for(const [date,count] of Object.entries(d.spiritCredits?.gratitudeDays??{}))migratedDays[date]=Math.max(migratedDays[date]??0,Number(count))
+ return {...d,gratitudes,encounters:d.encounters??[],spirit:{gratitude:d.spirit?.gratitude??gratitudes.length,expectation:d.spirit?.expectation??d.dreams.length},spiritCredits:{dreams:d.spiritCredits?.dreams??[...new Set(d.dreams.flatMap(dreamCreditKeys))],gratitudes:d.spiritCredits?.gratitudes??[...new Set(gratitudes.map(gratitudeCreditKey))],gratitudeDays:migratedDays}}
 
 }
 export function toggleGoal(d: Data, date: string, goalId: string): Data {
@@ -79,13 +84,32 @@ export function registerDream(d:Data,dream:Dream):Data{
  const credited=keys.some(key=>prior.has(key))
  return {...d,dreams:[...d.dreams,dream],spirit:{...d.spirit,expectation:d.spirit.expectation+(credited?0:1)},spiritCredits:{...d.spiritCredits,dreams:[...new Set([...prior,...keys])]}}
 }
+export const DAILY_GRATITUDE_LIMIT=3
+export function dailyGratitudePoints(d:Data,date:string):number{return d.spiritCredits.gratitudeDays[date]??0}
+function migrateGratitudeDays(entries:Gratitude[],legacyKeys:string[]):Record<string,number>{
+ const credits=new Map<string,Set<string>>()
+ const add=(date:string,key:string)=>{if(!credits.has(date))credits.set(date,new Set());credits.get(date)!.add(key)}
+ for(const key of legacyKeys){if(/^\d{4}-\d{2}-\d{2}\|/.test(key))add(key.slice(0,10),key)}
+ for(const entry of entries){if(entry.pointsAwarded===1)add(entry.date,`submission:${entry.id}`);else if(entry.pointsAwarded===undefined)add(entry.date,gratitudeCreditKey(entry))}
+ return Object.fromEntries([...credits].map(([date,keys])=>[date,Math.min(DAILY_GRATITUDE_LIMIT,keys.size)]))
+}
 export function recordGratitude(d:Data,entry:Gratitude):Data{
- if(d.gratitudes.some(item=>item.id===entry.id))return d
- const text=entry.text.trim()
- if(!text||text.length>1000)throw new Error('ありがとうを1〜1000文字で書いてください。')
+ const submissionKey=`submission:${entry.id}`
+ if(d.gratitudes.some(item=>item.id===entry.id)||d.spiritCredits.gratitudes.includes(submissionKey))return d
+ let text=entry.text.trim()
+ let selected:GratitudeChoice[]|undefined
+ if(entry.selectedThanks!==undefined||entry.freeText!==undefined){
+  if((entry.freeText?.length??0)>1000)throw new Error('自分の言葉は1000文字以内で添えてください。')
+  const selectedIds=[...new Set((entry.selectedThanks??[]).map(choice=>choice.id))]
+  selected=selectedIds.map(id=>{const choice=gratitudeChoices.find(item=>item.id===id);if(!choice)throw new Error('ありがとうの選択肢が見つかりませんでした。');return {...choice}})
+  text=composeGratitude(selected,entry.freeText??'')
+ }
+ if(!text||text.length>10000)throw new Error('ありがとうを選ぶか、自分の言葉を添えてください。')
+ if(entry.selectedThanks===undefined&&entry.freeText===undefined&&text.length>1000)throw new Error('ありがとうを1000文字以内で書いてください。')
  if(entry.dreamId&&!d.dreams.some(dream=>dream.id===entry.dreamId&&dream.status==='fulfilled'))throw new Error('この夢の達成記録が見つかりませんでした。')
- const key=gratitudeCreditKey({...entry,text}),prior=new Set([...d.spiritCredits.gratitudes,...d.gratitudes.map(gratitudeCreditKey)])
- return {...d,gratitudes:[...d.gratitudes,{...entry,text}],spirit:{...d.spirit,gratitude:d.spirit.gratitude+(prior.has(key)?0:1)},spiritCredits:{...d.spiritCredits,gratitudes:[...new Set([...prior,key])]}}
+ const used=dailyGratitudePoints(d,entry.date),awarded:0|1=used<DAILY_GRATITUDE_LIMIT?1:0
+ const saved:Gratitude={...entry,text,pointsAwarded:awarded,...(selected?{selectedThanks:selected,freeText:(entry.freeText??'').trim()}:{})}
+ return {...d,gratitudes:[...d.gratitudes,saved],spirit:{...d.spirit,gratitude:d.spirit.gratitude+awarded},spiritCredits:{...d.spiritCredits,gratitudes:[...d.spiritCredits.gratitudes,submissionKey],gratitudeDays:{...d.spiritCredits.gratitudeDays,[entry.date]:used+awarded}}}
 }
 export function recordEncounter(d:Data,entry:Encounter):Data{
  const kind=resolveMiracleId(entry.kind)

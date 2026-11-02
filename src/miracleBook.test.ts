@@ -47,13 +47,13 @@ describe('積み重ねを追加し直しで増やさない',()=>{
   expect(next.dreams).toHaveLength(1);expect(next.spirit.expectation).toBe(1)
   expect(decode(JSON.stringify(next)).spirit.expectation).toBe(1)
  })
- it('同日の同じ感謝は再追加しても増えず、翌日の感謝は蓄積できる',()=>{
+ it('同日の意図的な再奉納も1回として数え、翌日も蓄積できる',()=>{
   const entry={id:'a',text:'今日もありがとう',date:'2026-11-02',createdAt:'2026-11-02T01:00:00Z'}
   let d=recordGratitude(empty(),entry);d={...d,gratitudes:[]};d=decode(JSON.stringify(d))
   d=recordGratitude(d,{...entry,id:'b'})
-  expect(d.spirit.gratitude).toBe(1)
-  expect(decode(JSON.stringify(d)).spirit.gratitude).toBe(1)
-  expect(recordGratitude(d,{...entry,id:'c',date:'2026-11-03'}).spirit.gratitude).toBe(2)
+  expect(d.spirit.gratitude).toBe(2)
+  expect(decode(JSON.stringify(d)).spirit.gratitude).toBe(2)
+  expect(recordGratitude(d,{...entry,id:'c',date:'2026-11-03'}).spirit.gratitude).toBe(3)
  })
 })
 
