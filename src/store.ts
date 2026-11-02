@@ -1,3 +1,5 @@
+import { isAnimatedMiracle, resolveMiracleId } from './miracleCatalog'
+import type { MiracleId } from './miracleCatalog'
 import type { DreamSuggestion } from './dreamCatalog'
 export type Dream = { id: string; suggestionId?: string; title: string; detail: string; createdAt: string; target: string; status: 'wishing' | 'fulfilled'; achievedAt?: string; message?: string }
 export type Goal = { id: string; title: string; done: boolean }
@@ -5,13 +7,13 @@ export type Transaction = { id: string; date: string; amount: number; kind: 'ear
 export type Fortune = { id: string; rank: string; message: string; action: string; color: string }
 export type Gratitude = { id: string; text: string; date: string; createdAt: string; dreamId?: string }
 export type Spirit = { gratitude: number; expectation: number }
-export type EncounterKind = 'cat' | 'blossoms' | 'butterfly' | 'shootingStar' | 'deity' | 'miracle'
+export type EncounterKind = MiracleId | 'miracle'
 export type Encounter = { id: string; kind: EncounterKind; date: string; createdAt: string }
-export type Data = { version: 1; gratitudes: Gratitude[]; spirit: Spirit; encounters: Encounter[]; dreams: Dream[]; dailyGoals: Record<string, Goal[]>; transactions: Transaction[]; fortunes: Record<string, Fortune>; settings: { id: string; sound: boolean; welcomed: boolean } }
+export type Data = { version: 1; spiritCredits: {dreams:string[];gratitudes:string[]}; gratitudes: Gratitude[]; spirit: Spirit; encounters: Encounter[]; dreams: Dream[]; dailyGoals: Record<string, Goal[]>; transactions: Transaction[]; fortunes: Record<string, Fortune>; settings: { id: string; sound: boolean; welcomed: boolean } }
 export const KEY = 'yumekana-shrine:v1'
 export const id = () => crypto.randomUUID()
 export const localDate = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-export const empty = (): Data => ({ version: 1, gratitudes: [], spirit: { gratitude: 0, expectation: 0 }, encounters: [], dreams: [], dailyGoals: {}, transactions: [], fortunes: {}, settings: { id: id(), sound: false, welcomed: false } })
+export const empty = (): Data => ({ version: 1, spiritCredits:{dreams:[],gratitudes:[]}, gratitudes: [], spirit: { gratitude: 0, expectation: 0 }, encounters: [], dreams: [], dailyGoals: {}, transactions: [], fortunes: {}, settings: { id: id(), sound: false, welcomed: false } })
 export const balance = (d: Data) => d.transactions.reduce((n, t) => n + t.amount, 0)
 export function decode(raw: string): Data {
  const d = JSON.parse(raw)
@@ -20,8 +22,11 @@ export function decode(raw: string): Data {
  // Additive migration: v1 data from before gratitude keeps every existing record.
  if (d.gratitudes !== undefined && (!Array.isArray(d.gratitudes) || !d.gratitudes.every((g: Gratitude) => g && [g.id,g.text,g.date,g.createdAt].every(str) && (g.dreamId === undefined || str(g.dreamId))))) throw new Error('ありがとうの記録を読み込めませんでした')
  if (d.spirit !== undefined && (!d.spirit || ![d.spirit.gratitude,d.spirit.expectation].every(n => Number.isSafeInteger(n) && n >= 0))) throw new Error('感謝度・期待度を読み込めませんでした')
- if (d.encounters !== undefined && (!Array.isArray(d.encounters) || !d.encounters.every((e: Encounter) => e && [e.id,e.date,e.createdAt].every(str) && ['cat','blossoms','butterfly','shootingStar','deity','miracle'].includes(e.kind)))) throw new Error('境内の記録を読み込めませんでした')
- return { ...d, gratitudes: d.gratitudes ?? [], encounters: d.encounters ?? [], spirit: { gratitude: Math.max(d.spirit?.gratitude ?? 0, d.gratitudes?.length ?? 0), expectation: Math.max(d.spirit?.expectation ?? 0, d.dreams.length) } }
+ if (d.encounters !== undefined && (!Array.isArray(d.encounters) || !d.encounters.every((e: Encounter) => e && [e.id,e.date,e.createdAt].every(str) && Boolean(resolveMiracleId(e.kind))))) throw new Error('境内の記録を読み込めませんでした')
+ if(d.spiritCredits!==undefined&&(!d.spiritCredits||!Array.isArray(d.spiritCredits.dreams)||!d.spiritCredits.dreams.every(str)||!Array.isArray(d.spiritCredits.gratitudes)||!d.spiritCredits.gratitudes.every(str)))throw new Error('積み重ねの記録を読み込めませんでした')
+ const gratitudes:Gratitude[]=d.gratitudes??[]
+ return {...d,gratitudes,encounters:d.encounters??[],spirit:{gratitude:d.spirit?.gratitude??gratitudes.length,expectation:d.spirit?.expectation??d.dreams.length},spiritCredits:{dreams:d.spiritCredits?.dreams??[...new Set(d.dreams.flatMap(dreamCreditKeys))],gratitudes:d.spiritCredits?.gratitudes??[...new Set(gratitudes.map(gratitudeCreditKey))]}}
+
 }
 export function toggleGoal(d: Data, date: string, goalId: string): Data {
  const goal = d.dailyGoals[date]?.find(g => g.id === goalId)
@@ -64,20 +69,26 @@ export function addSuggestedDream(d: Data, suggestion: DreamSuggestion, date: st
 }
 
 
-export function registerDream(d: Data, dream: Dream): Data {
- if (d.dreams.some(item => item.id === dream.id)) return d
- return { ...d, dreams: [...d.dreams, dream], spirit: { ...d.spirit, expectation: d.spirit.expectation + 1 } }
-}
+function dreamCreditKeys(dream:Dream):string[]{return [`title:${normalizeDreamTitle(dream.title)}`,...(dream.suggestionId?[`suggestion:${dream.suggestionId}`]:[])]}
+function gratitudeCreditKey(entry:Gratitude):string{return `${entry.date}|${normalizeDreamTitle(entry.text)}`}
 
-export function recordGratitude(d: Data, entry: Gratitude): Data {
- if (d.gratitudes.some(item => item.id === entry.id)) return d
- const text = entry.text.trim()
- if (!text || text.length > 1000) throw new Error('ありがとうを1〜1000文字で書いてください。')
- if (entry.dreamId && !d.dreams.some(dream => dream.id === entry.dreamId && dream.status === 'fulfilled')) throw new Error('この夢の達成記録が見つかりませんでした。')
- return { ...d, gratitudes: [...d.gratitudes, { ...entry, text }], spirit: { ...d.spirit, gratitude: d.spirit.gratitude + 1 } }
+export function registerDream(d:Data,dream:Dream):Data{
+ if(d.dreams.some(item=>item.id===dream.id))return d
+ const keys=dreamCreditKeys(dream)
+ const prior=new Set([...d.spiritCredits.dreams,...d.dreams.flatMap(dreamCreditKeys)])
+ const credited=keys.some(key=>prior.has(key))
+ return {...d,dreams:[...d.dreams,dream],spirit:{...d.spirit,expectation:d.spirit.expectation+(credited?0:1)},spiritCredits:{...d.spiritCredits,dreams:[...new Set([...prior,...keys])]}}
 }
-
-export function recordEncounter(d: Data, entry: Encounter): Data {
- if (d.encounters.some(item => item.id === entry.id)) return d
- return { ...d, encounters: [...d.encounters, entry] }
+export function recordGratitude(d:Data,entry:Gratitude):Data{
+ if(d.gratitudes.some(item=>item.id===entry.id))return d
+ const text=entry.text.trim()
+ if(!text||text.length>1000)throw new Error('ありがとうを1〜1000文字で書いてください。')
+ if(entry.dreamId&&!d.dreams.some(dream=>dream.id===entry.dreamId&&dream.status==='fulfilled'))throw new Error('この夢の達成記録が見つかりませんでした。')
+ const key=gratitudeCreditKey({...entry,text}),prior=new Set([...d.spiritCredits.gratitudes,...d.gratitudes.map(gratitudeCreditKey)])
+ return {...d,gratitudes:[...d.gratitudes,{...entry,text}],spirit:{...d.spirit,gratitude:d.spirit.gratitude+(prior.has(key)?0:1)},spiritCredits:{...d.spiritCredits,gratitudes:[...new Set([...prior,key])]}}
+}
+export function recordEncounter(d:Data,entry:Encounter):Data{
+ const kind=resolveMiracleId(entry.kind)
+ if(!kind||!isAnimatedMiracle(kind)||d.encounters.some(item=>item.id===entry.id))return d
+ return {...d,encounters:[...d.encounters,{...entry,kind}]}
 }

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Pause, Play } from 'lucide-react'
+import { Pause, Play, BookOpen } from 'lucide-react'
 import { ShrineEncounter } from './ShrineEncounter'
 import type { Encounter, Spirit } from './store'
 
-export function Shrine({ go, spirit, onEncounter }: { go: (page: 'dreams' | 'offering' | 'fortune') => void; spirit: Spirit; onEncounter: (entry: Encounter) => void }) {
+export function Shrine({ go, spirit, onEncounter, discoveredCount }: { go: (page: 'dreams' | 'offering' | 'fortune' | 'book') => void; spirit: Spirit; onEncounter: (entry: Encounter) => void; discoveredCount: number }) {
  const [portrait, setPortrait] = useState(() => window.matchMedia('(max-width: 760px)').matches)
  const [paused, setPaused] = useState(false)
  useEffect(() => {
@@ -21,5 +21,5 @@ export function Shrine({ go, spirit, onEncounter }: { go: (page: 'dreams' | 'off
  <g><path d="M83 418Q112 234 43 121M102 280L178 175M908 433Q875 259 949 118M901 279L824 182" fill="none" stroke="#846a65" strokeWidth="19"/>{[[35,115],[97,135],[48,186],[150,176],[177,212],[5,221],[961,113],[909,151],[978,190],[842,179],[806,215]].map(([x,y],i)=><g key={i} fill={i%2?'#ecc0cb':'#f4ced5'}><ellipse cx={x} cy={y} rx="74" ry="43"/><circle cx={x-30} cy={y-25} r="35"/><circle cx={x+32} cy={y-20} r="37"/></g>)}</g>
  <g><rect x="451" y="425" width="98" height="59" rx="3" fill="#9f7656"/><path d="M446 424h108l-8 15h-92z" fill="#705e4d"/><path d="M458 429h84M464 426v10M477 426v10M490 426v10M503 426v10M516 426v10M529 426v10" stroke="#c3a37d" strokeWidth="3"/><text x="500" y="466" textAnchor="middle" fill="#ffe7b3" fontSize="16" letterSpacing="5">奉納</text></g>
  {Array.from({length:26},(_,i)=><g key={i} transform={`translate(${(i*137+50)%1000} -220)`} aria-hidden="true"><g className="petal-fall" style={{animationDuration:`${16+i%7*1.7}s`,animationDelay:`-${i*2.3}s`}}><g className="petal-drift" style={{animationDuration:`${4+i%4*.8}s`,animationDelay:`-${i*.6}s`}}><path className="sakura-petal" d="M0 -6C7 -7 10 0 2 7L0 4 -2 7C-9 1 -6 -5 0 -6Z" fill={i%3?'#edacc2':'#f8d2df'} opacity=".85" transform={`scale(${.5+i%4*.16})`}/></g></g></g>)}
- </svg><ShrineEncounter spirit={spirit} paused={paused} onEncounter={onEncounter}/><button className="ambient-toggle" onClick={()=>setPaused(!paused)} aria-pressed={paused}>{paused?<Play size={15}/>:<Pause size={15}/>} {paused?'風を感じる':'風をとめる'}</button><button className="scene-label ema-label" onClick={()=>go('dreams')}>絵馬殿 <span>↗</span></button><button className="scene-label fortune-label" onClick={()=>go('fortune')}>おみくじ <span>↗</span></button><button className="scene-label offering-label" onClick={()=>go('offering')}>お賽銭を奉納 <span>↗</span></button><div className="scene-caption">心をほどいて、夢にひとつ近づく場所。</div></div>
+ </svg><button className="miracle-book-button" onClick={()=>go('book')}><BookOpen size={17}/>奇跡図鑑 <span>{discoveredCount}/50</span></button><ShrineEncounter spirit={spirit} paused={paused} onEncounter={onEncounter}/><button className="ambient-toggle" onClick={()=>setPaused(!paused)} aria-pressed={paused}>{paused?<Play size={15}/>:<Pause size={15}/>} {paused?'風を感じる':'風をとめる'}</button><button className="scene-label ema-label" onClick={()=>go('dreams')}>絵馬殿 <span>↗</span></button><button className="scene-label fortune-label" onClick={()=>go('fortune')}>おみくじ <span>↗</span></button><button className="scene-label offering-label" onClick={()=>go('offering')}>お賽銭を奉納 <span>↗</span></button><div className="scene-caption">心をほどいて、夢にひとつ近づく場所。</div></div>
 }

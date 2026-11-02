@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { encounterWeights } from '../src/encounters'
-import type { EncounterKind } from '../src/store'
+import { implementedMiracles,miracleCatalog } from '../src/miracleCatalog'
+import type { AnimatedMiracleId } from '../src/miracleCatalog'
 
 async function navigate(page: Page, label: string) {
   const mobile = await page.locator('.bottom-nav').isVisible()
@@ -253,7 +254,7 @@ test('お礼参りの記録・下書き・感謝度と夢からのお礼を保�
   await page.screenshot({path:testInfo.outputPath('gratitude-page.png'),fullPage:true})
 })
 
-test('境内の超レア演出は保存され、別ページでは抽選しない', async ({ page }) => {
+test('境内のレア演出は保存され、別ページでは抽選しない', async ({ page }) => {
   await enter(page)
   await page.evaluate(() => {
     const key = 'yumekana-shrine:v1'
@@ -261,12 +262,15 @@ test('境内の超レア演出は保存され、別ページでは抽選しな�
     data.spirit = {gratitude:0,expectation:40}
     localStorage.setItem(key,JSON.stringify(data))
   })
-  await page.addInitScript(() => { Math.random = () => 0 })
+  const weights=encounterWeights({gratitude:0,expectation:40})
+  const target=weights.findIndex(entry=>entry.kind==='deitySmile')
+  const roll=weights.slice(0,target).reduce((sum,entry)=>sum+entry.weight,0)+weights[target].weight/2
+  await page.addInitScript(roll => { Math.random = () => roll },roll)
   await page.clock.install()
   await page.reload()
   await page.clock.fastForward(9000)
   await expect(page.locator('.encounter-miracle')).toBeVisible()
-  await expect(page.locator('.encounter-caption')).toContainText('感謝と期待が結ぶ、小さな奇跡')
+  await expect(page.locator('.encounter-caption')).toContainText('神様が微笑む')
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('yumekana-shrine:v1')!).encounters.length)).toBe(1)
   await navigate(page, 'お礼参り')
   await page.clock.fastForward(120000)
@@ -277,7 +281,7 @@ test('境内の超レア演出は保存され、別ページでは抽選しな�
 })
 
 
-for (const kind of ['cat','blossoms','butterfly','shootingStar','deity','miracle'] as EncounterKind[]) {
+for (const kind of implementedMiracles.map(item=>item.id) as AnimatedMiracleId[]) {
  test(`レア演出「${kind}」の専用画像を表示できる`, async ({ page }, testInfo) => {
   await enter(page)
   const weights = encounterWeights({gratitude:40,expectation:0})
@@ -297,7 +301,7 @@ for (const kind of ['cat','blossoms','butterfly','shootingStar','deity','miracle
   await page.clock.install()
   await page.reload()
   await page.clock.fastForward(9000)
-  const image = page.locator(`.encounter-${kind} .encounter-image`)
+  const image = page.locator(`.encounter-${kind} .encounter-image`).first()
   await expect(image).toBeVisible()
   expect(await image.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true)
   const entries = await page.evaluate(() => JSON.parse(localStorage.getItem('yumekana-shrine:v1')!).encounters)
@@ -328,4 +332,39 @@ test('画像を読み込めないときは見えない出会いを記録しな�
  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('yumekana-shrine:v1')!).encounters)).toHaveLength(0)
  await navigate(page, 'お礼参り')
  await expect(page.getByRole('heading', {name:'お礼参り',exact:true})).toBeVisible()
+})
+
+
+test('奇跡図鑑に全50種類を表示し、旧履歴の初回日時とフィルターを保持する',async({page},testInfo)=>{
+ await enter(page)
+ await page.evaluate(()=>{
+  const k='yumekana-shrine:v1',d=JSON.parse(localStorage.getItem(k)!)
+  d.encounters=[
+   {id:'old',kind:'miracle',date:'2026-11-01',createdAt:'2026-11-01T01:00:00.000Z'},
+   {id:'new',kind:'deitySmile',date:'2026-11-02',createdAt:'2026-11-02T01:00:00.000Z'},
+   {id:'cat',kind:'cat',date:'2026-11-02',createdAt:'2026-11-02T02:00:00.000Z'},
+  ]
+  localStorage.setItem(k,JSON.stringify(d))
+ })
+ await page.reload()
+ await page.locator('.miracle-book-button').click()
+ await expect(page.locator('.miracle-card')).toHaveCount(50)
+ await expect(page.locator('.miracle-card.discovered')).toHaveCount(2)
+ await expect(page.locator('.book-overview b')).toHaveText('2 / 50')
+ const smile=page.getByRole('article',{name:'神様が微笑む',exact:true})
+ await expect(smile.locator('time')).toHaveAttribute('datetime','2026-11-01T01:00:00.000Z')
+ await expect(page.getByRole('heading',{name:'龍が空を横切る',exact:true})).toHaveCount(0)
+ await page.getByRole('button',{name:'SSR：奇跡',exact:true}).click()
+ await expect(page.locator('.miracle-card')).toHaveCount(miracleCatalog.filter(item=>item.rarity==='SSR').length)
+ await expect(page.locator('.miracle-card.discovered')).toHaveCount(1)
+ await page.getByRole('button',{name:'すべて',exact:true}).click()
+ if(testInfo.project.name==='mobile-chromium')await page.setViewportSize({width:320,height:760})
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
+ await page.screenshot({path:testInfo.outputPath('miracle-book.png'),fullPage:true})
+ await expect(page.getByText('開発用：演出確認（記録しません）',{exact:true})).toHaveCount(0)
+ await page.getByRole('button',{name:'境内へ戻る',exact:true}).click()
+ await expect(page.locator('.miracle-book-button')).toContainText('2/50')
+ await page.reload()
+ await page.locator('.miracle-book-button').click()
+ await expect(page.locator('.miracle-card.discovered')).toHaveCount(2)
 })

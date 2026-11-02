@@ -24,7 +24,7 @@ export function GratitudePage({ entries, spirit, text, onText, linkedDream, onUn
    <section className="spirit-panel" aria-label="感謝と期待の積み重ね">
     <div><span className="spirit-orb gratitude-orb"><Heart size={23}/></span><span><small>感謝度</small><strong>{spirit.gratitude}</strong><em>気づいた、ありがとう。</em></span></div>
     <div><span className="spirit-orb expectation-orb"><Sparkles size={23}/></span><span><small>期待度</small><strong>{spirit.expectation}</strong><em>思い描いた、これから。</em></span></div>
-    <div className="spirit-total"><span>感謝度 ＋ 期待度</span><b>{spiritTotal(spirit)}</b><small>合計の数値で、境内の出会いが増えていきます。</small></div><p>数字は減りません。あなたのペースで、少しずつ。<br/>感謝からでも、夢からでも。境内に小さな彩りが育ちます。</p>
+    <div className="spirit-total"><span>感謝度 ＋ 期待度</span><b>{spiritTotal(spirit)}</b><small>合計で出会いやすく、感謝と期待の内訳で彩り豊かに。</small></div><p>数字は減りません。あなたのペースで、少しずつ。<br/>感謝からでも、夢からでも。境内に小さな彩りが育ちます。</p>
    </section>
    <section className={'content-card gratitude-writing' + (celebrating ? ' gratitude-celebrating' : '')}>
     <p className="eyebrow"><Heart size={14}/> THANK YOU, TODAY</p><h2>今日のありがとう</h2>
@@ -43,7 +43,7 @@ export function GratitudePage({ entries, spirit, text, onText, linkedDream, onUn
      <div className="gratitude-form-bottom"><span>{text.length} / 1000</span><button className="primary" disabled={!text.trim() || celebrating}><Heart size={16}/>ありがとうを残す</button></div>
     </form>
     {celebrating && <div className="gratitude-glow" role="status"><Sparkles size={20}/><b>ありがとうが、境内に届きました。</b><span aria-hidden="true">✿　✧　✿</span></div>}
-    <p className="help-text">書きたいときだけで大丈夫。お休みしても、これまでの気持ちはそのままです。</p>
+    <p className="help-text">同じ日の同じありがとうは、記録を残し、感謝度は重複して増やしません。書きたいときだけで大丈夫。お休みしても、これまでの気持ちはそのままです。</p>
    </section>
    <div className="gratitude-stats"><span><b>{entries.length}</b> 回のありがとう</span><span><b>{days}</b> 日の思い出</span><button onClick={onVisit}>境内を訪れる <span aria-hidden="true">↗</span></button></div>
    <section className="gratitude-records" aria-labelledby="gratitude-records-title"><h2 id="gratitude-records-title">ありがとうの記録</h2>
