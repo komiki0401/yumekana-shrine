@@ -1,4 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
+import { encounterWeights } from '../src/encounters'
+import type { EncounterKind } from '../src/store'
 
 async function navigate(page: Page, label: string) {
   const mobile = await page.locator('.bottom-nav').isVisible()
@@ -272,4 +274,58 @@ test('境内の超レア演出は保存され、別ページでは抽選しな�
   await expect(page.locator('.spirit-panel strong').first()).toHaveText('0')
   await expect(page.locator('.spirit-panel strong').nth(1)).toHaveText('40')
   await expect(page.locator('.spirit-total b')).toHaveText('40')
+})
+
+
+for (const kind of ['cat','blossoms','butterfly','shootingStar','deity','miracle'] as EncounterKind[]) {
+ test(`レア演出「${kind}」の専用画像を表示できる`, async ({ page }, testInfo) => {
+  await enter(page)
+  const weights = encounterWeights({gratitude:40,expectation:0})
+  let start = 0
+  for (const entry of weights) {
+   if (entry.kind === kind) break
+   start += entry.weight
+  }
+  const weight = weights.find(entry => entry.kind === kind)!.weight
+  await page.evaluate(() => {
+   const key = 'yumekana-shrine:v1'
+   const data = JSON.parse(localStorage.getItem(key)!)
+   data.spirit = {gratitude:40,expectation:0}
+   localStorage.setItem(key,JSON.stringify(data))
+  })
+  await page.addInitScript(roll => { Math.random = () => roll }, start + weight / 2)
+  await page.clock.install()
+  await page.reload()
+  await page.clock.fastForward(9000)
+  const image = page.locator(`.encounter-${kind} .encounter-image`)
+  await expect(image).toBeVisible()
+  expect(await image.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true)
+  const entries = await page.evaluate(() => JSON.parse(localStorage.getItem('yumekana-shrine:v1')!).encounters)
+  expect(entries).toHaveLength(1)
+  expect(entries[0].kind).toBe(kind)
+  await expect(page.locator('.deity-light')).toHaveCount(0)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.screenshot({path:testInfo.outputPath('encounter-image.png')})
+ })
+}
+
+test('画像を読み込めないときは見えない出会いを記録しない', async ({ page }) => {
+ await enter(page)
+ await page.evaluate(() => {
+  const key = 'yumekana-shrine:v1'
+  const data = JSON.parse(localStorage.getItem(key)!)
+  data.spirit = {gratitude:1,expectation:0}
+  localStorage.setItem(key,JSON.stringify(data))
+ })
+ await page.addInitScript(() => { Math.random = () => 0 })
+ await page.route('**/assets/cat-*.png', route => route.abort())
+ await page.clock.install()
+ const failed = page.waitForEvent('requestfailed', request => /assets\/cat-.*\.png/.test(request.url()))
+ await page.reload()
+ await page.clock.fastForward(9000)
+ await failed
+ await expect(page.locator('.shrine-encounter')).toHaveCount(0)
+ expect(await page.evaluate(() => JSON.parse(localStorage.getItem('yumekana-shrine:v1')!).encounters)).toHaveLength(0)
+ await navigate(page, 'お礼参り')
+ await expect(page.getByRole('heading', {name:'お礼参り',exact:true})).toBeVisible()
 })

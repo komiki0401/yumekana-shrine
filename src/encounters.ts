@@ -1,12 +1,12 @@
 import type { EncounterKind, Spirit } from './store'
 
-export const encounterCatalog: Record<EncounterKind, { symbol: string; title: string; message: string }> = {
- cat: { symbol: '🐈', title: '猫が遊びに来ました', message: 'あなたのそばで、のんびりひと休み。' },
- blossoms: { symbol: '🌸', title: '桜がふわりと祝福を', message: 'ありがとうの気持ちが、花の風になりました。' },
- butterfly: { symbol: '🦋', title: '蝶が舞い降りました', message: '小さな羽が、境内に彩りを添えています。' },
- shootingStar: { symbol: '🌠', title: '願いの空に、流れ星', message: '思い描いた未来に、そっと光が差します。' },
- deity: { symbol: '✨', title: '神さまが、そっと姿を見せました', message: 'やさしい光が、あなたの夢を見守っています。' },
- miracle: { symbol: '🌈', title: '感謝と期待が結ぶ、小さな奇跡', message: '虹色の光に包まれて、神さまがそっと微笑みました。' },
+export const encounterCatalog: Record<EncounterKind, { title: string; message: string }> = {
+ cat: { title: '猫が遊びに来ました', message: 'あなたのそばで、のんびりひと休み。' },
+ blossoms: { title: '桜がふわりと祝福を', message: 'ありがとうの気持ちが、花の風になりました。' },
+ butterfly: { title: '蝶が舞い降りました', message: '小さな羽が、境内に彩りを添えています。' },
+ shootingStar: { title: '願いの空に、流れ星', message: '思い描いた未来に、そっと光が差します。' },
+ deity: { title: '神さまが、そっと姿を見せました', message: 'やさしい光が、あなたの夢を見守っています。' },
+ miracle: { title: '感謝と期待が結ぶ、小さな奇跡', message: '虹色の光に包まれて、神さまがそっと微笑みました。' },
 }
 
 // All unlocks depend only on the combined value. The old 20 + 20 condition
