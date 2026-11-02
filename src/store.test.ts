@@ -21,6 +21,7 @@ describe('夢の達成報酬', () => {
  it('初回の夢達成だけに小判を付与し同じ夢では重複しない', () => {
   const d = empty()
   d.dreams = [{ id: 'dream-1', title: '美味しいご飯', detail: '', target: '', createdAt: date, status: 'wishing' }]
+  d.spirit.expectation = 1
   const next = fulfillDream(d, 'dream-1', date, '幸せでした')
   expect(next.dreams[0]).toMatchObject({ status: 'fulfilled', message: '幸せでした', achievedAt: date })
   expect(balance(next)).toBe(1)
