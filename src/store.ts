@@ -1,6 +1,6 @@
 export type Dream = { id: string; title: string; detail: string; createdAt: string; target: string; status: 'wishing' | 'fulfilled'; achievedAt?: string; message?: string }
 export type Goal = { id: string; title: string; done: boolean }
-export type Transaction = { id: string; date: string; amount: number; kind: 'earn' | 'undo' | 'offer'; goalId?: string }
+export type Transaction = { id: string; date: string; amount: number; kind: 'earn' | 'undo' | 'offer'; goalId?: string; dreamId?: string }
 export type Fortune = { id: string; rank: string; message: string; action: string; color: string }
 export type Data = { version: 1; dreams: Dream[]; dailyGoals: Record<string, Goal[]>; transactions: Transaction[]; fortunes: Record<string, Fortune>; settings: { id: string; sound: boolean; welcomed: boolean } }
 export const KEY = 'yumekana-shrine:v1'
@@ -21,7 +21,7 @@ export function toggleGoal(d: Data, date: string, goalId: string): Data {
  return { ...d, dailyGoals: { ...d.dailyGoals, [date]: d.dailyGoals[date].map(g => g.id === goalId ? { ...g, done: !g.done } : g) }, transactions: [...d.transactions, { id: id(), date, amount: goal.done ? -1 : 1, kind: goal.done ? 'undo' : 'earn', goalId }] }
 }
 export function offer(d: Data, date: string): Data {
- if (balance(d) < 1) throw new Error('小さな目標を達成すると、小判を1枚もらえます。')
+ if (balance(d) < 1) throw new Error('絵馬殿で夢を叶えると、小判を1枚もらえます。')
  return { ...d, transactions: [...d.transactions, { id: id(), date, amount: -1, kind: 'offer' }] }
 }
 const messages = [
@@ -35,4 +35,10 @@ export function draw(d: Data, date: string): Data {
  if (d.fortunes[date]) return d
  const [rank,message,action,color] = messages[Math.floor(Math.random()*messages.length)]
  return { ...d, fortunes: { ...d.fortunes, [date]: { id: id(), rank,message,action,color } } }
+}
+
+export function fulfillDream(d: Data, dreamId: string, date: string, message: string): Data {
+ const dream = d.dreams.find(item => item.id === dreamId)
+ if (!dream || dream.status === 'fulfilled') return d
+ return { ...d, dreams: d.dreams.map(item => item.id === dreamId ? { ...item, status: 'fulfilled', achievedAt: date, message } : item), transactions: [...d.transactions, { id: id(), date, amount: 1, kind: 'earn', dreamId }] }
 }
