@@ -1,6 +1,7 @@
-# 開運暦・ローカル試験版
+# 開運暦・試験版
 
-ブランチ：`codex/lucky-calendar-trial`。GitHubへのpush・公開は行わない。
+実装ブランチ：`codex/lucky-calendar-trial`。2026-11-03、ユーザーの公開指示によりmainへ反映し、GitHub Pagesで公開する方針に変更。
+公開URL：`https://komiki0401.github.io/yumekana-shrine/`。「開運暦」タブから確認する。
 
 ## 確認する
 
@@ -15,16 +16,17 @@ npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
 
 ## 元に戻す
 
-試験実装はローカルコミットとしてこのブランチだけに保存する。`main`は変更しない。
+公開前の6タブ版はコミット `490468e` に保存されている。ローカルで旧版を確認する場合は専用ブランチを作る。
 開発サーバーをCtrl+Cで止め、作業ツリーに追加の未コミット変更がないことを確認してから：
 
 ```powershell
-git switch main
+git switch -c codex/before-calendar 490468e
 npm ci
 npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-ブラウザを再読み込みすると元の6タブ構成に戻る。再試験は `git switch codex/lucky-calendar-trial` と `npm ci`。
+ブラウザを再読み込みすると元の6タブ構成に戻る。開運暦へ戻るには `git switch main` と `npm ci`。
+この操作だけでは公開サイトは戻らない。公開版を戻す場合は、main上で試験実装コミット `82747d4` を `git revert` し、通常のpushとデプロイで反映する。
 保存データを消す操作は不要。別の未コミット変更がある場合はそれを先に保護する。`reset --hard`は不要。
 
 ## 計算方法と範囲
