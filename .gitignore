@@ -6,3 +6,5 @@ dist/
 playwright-report/
 test-results/
 .local-backups/
+server/.data/
+test-results-ai/

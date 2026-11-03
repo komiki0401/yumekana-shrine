@@ -3,7 +3,9 @@ import type { GratitudeChoice } from './gratitudeChoices'
 import { isAnimatedMiracle, resolveMiracleId } from './miracleCatalog'
 import type { MiracleId } from './miracleCatalog'
 import type { DreamSuggestion } from './dreamCatalog'
-export type Dream = { id: string; suggestionId?: string; title: string; detail: string; createdAt: string; target: string; status: 'wishing' | 'fulfilled'; achievedAt?: string; message?: string }
+import { validYoshukuEma } from './yoshuku'
+import type { YoshukuEma } from './yoshuku'
+export type Dream = { id: string; suggestionId?: string; title: string; detail: string; createdAt: string; target: string; status: 'wishing' | 'fulfilled'; achievedAt?: string; message?: string; emaType?: 'normal' | 'yoshuku'; yoshuku?: YoshukuEma }
 export type Goal = { id: string; title: string; done: boolean }
 export type Transaction = { id: string; date: string; amount: number; kind: 'earn' | 'undo' | 'offer'; goalId?: string; dreamId?: string }
 export type Fortune = { id: string; rank: string; message: string; action: string; color: string }
@@ -22,6 +24,7 @@ export function decode(raw: string): Data {
  const str = (v: unknown) => typeof v === 'string'
  if (d?.version !== 1 || !Array.isArray(d.dreams) || !d.dreams.every((x: Dream) => x && [x.id,x.title,x.detail,x.createdAt,x.target].every(str) && ['wishing','fulfilled'].includes(x.status) && (x.achievedAt === undefined || str(x.achievedAt)) && (x.message === undefined || str(x.message)) && (x.suggestionId === undefined || str(x.suggestionId))) || !d.dailyGoals || typeof d.dailyGoals !== 'object' || Array.isArray(d.dailyGoals) || !Object.values(d.dailyGoals).every(v => Array.isArray(v) && v.length <= 3 && v.every(x => x && str(x.id) && str(x.title) && typeof x.done === 'boolean')) || !Array.isArray(d.transactions) || !d.transactions.every((x: Transaction) => x && str(x.id) && str(x.date) && [-1,1].includes(x.amount) && ['earn','undo','offer'].includes(x.kind) && (x.kind === 'earn' ? x.amount === 1 : x.amount === -1)) || !d.fortunes || typeof d.fortunes !== 'object' || Array.isArray(d.fortunes) || !Object.values(d.fortunes).every(v => v && typeof v === 'object' && ['id','rank','message','action','color'].every(k => str((v as Record<string, unknown>)[k]))) || !d.settings || !str(d.settings.id) || typeof d.settings.sound !== 'boolean' || typeof d.settings.welcomed !== 'boolean' || balance(d) < 0) throw new Error('保存データの形式を確認できませんでした')
  // Additive migration: v1 data from before gratitude keeps every existing record.
+ if (d.dreams.some((dream: Dream) => (dream.emaType !== undefined && !['normal','yoshuku'].includes(dream.emaType)) || (dream.yoshuku !== undefined && !validYoshukuEma(dream.yoshuku)) || (dream.emaType === 'yoshuku' && !dream.yoshuku))) throw new Error('予祝の絵馬を読み込めませんでした')
  if (d.gratitudes !== undefined && (!Array.isArray(d.gratitudes) || !d.gratitudes.every((g: Gratitude) => g && [g.id,g.text,g.date,g.createdAt].every(str) && (g.dreamId === undefined || str(g.dreamId)) && (g.freeText === undefined || str(g.freeText)) && (g.pointsAwarded === undefined || g.pointsAwarded === 0 || g.pointsAwarded === 1) && (g.selectedThanks === undefined || (Array.isArray(g.selectedThanks) && g.selectedThanks.length <= 100 && g.selectedThanks.every(choice => choice && [choice.id,choice.label,choice.sentence].every(str))))))) throw new Error('ありがとうの記録を読み込めませんでした')
  if (d.spirit !== undefined && (!d.spirit || ![d.spirit.gratitude,d.spirit.expectation].every(n => Number.isSafeInteger(n) && n >= 0))) throw new Error('感謝度・期待度を読み込めませんでした')
  if (d.encounters !== undefined && (!Array.isArray(d.encounters) || !d.encounters.every((e: Encounter) => e && [e.id,e.date,e.createdAt].every(str) && Boolean(resolveMiracleId(e.kind))))) throw new Error('境内の記録を読み込めませんでした')
@@ -83,6 +86,16 @@ export function registerDream(d:Data,dream:Dream):Data{
  const prior=new Set([...d.spiritCredits.dreams,...d.dreams.flatMap(dreamCreditKeys)])
  const credited=keys.some(key=>prior.has(key))
  return {...d,dreams:[...d.dreams,dream],spirit:{...d.spirit,expectation:d.spirit.expectation+(credited?0:1)},spiritCredits:{...d.spiritCredits,dreams:[...new Set([...prior,...keys])]}}
+}
+export function dedicateYoshuku(d: Data, dreamId: string, sourceId: string | undefined, title: string, yoshuku: YoshukuEma): Data {
+ if (!validYoshukuEma(yoshuku) || !title.trim() || title.length > 80 || !yoshuku.confirmedText.trim()) throw new Error('願いと予祝の文章を確認してください。')
+ if (sourceId) {
+  const source = d.dreams.find(dream => dream.id === sourceId)
+  if (!source || source.status !== 'wishing') throw new Error('元の絵馬が見つからないか、すでに叶っています。下書きは残しています。')
+  return { ...d, dreams: d.dreams.map(dream => dream.id === sourceId ? { ...dream, emaType: 'yoshuku', yoshuku: { ...yoshuku, createdAt: dream.yoshuku?.createdAt ?? yoshuku.createdAt } } : dream) }
+ }
+ if (d.dreams.some(dream => dream.id === dreamId)) return d
+ return registerDream(d, { id: dreamId, title: title.trim(), detail: '', target: '', createdAt: localDate(new Date(yoshuku.createdAt)), status: 'wishing', emaType: 'yoshuku', yoshuku })
 }
 export const DAILY_GRATITUDE_LIMIT=3
 export function dailyGratitudePoints(d:Data,date:string):number{return d.spiritCredits.gratitudeDays[date]??0}

@@ -7,9 +7,11 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
-    "test": "vitest run",
+    "test": "vitest run && node --test server/*.test.mjs scripts/*.test.mjs",
     "preview": "vite preview --host 0.0.0.0",
-    "test:e2e": "npm run build && playwright test"
+    "test:e2e": "npm run build && playwright test",
+    "yoshuku:server": "node --env-file-if-exists=server/.env server/yoshuku.mjs",
+    "test:e2e:ai": "playwright test --config=playwright.ai.config.ts"
   },
   "dependencies": {
     "astronomy-engine": "2.1.19",
