@@ -1,0 +1,191 @@
+/* Original SVGs, soft colours, and compositor-only motion. One event at a time. */
+.vector-miracle{position:absolute;inset:0;pointer-events:none;overflow:hidden;animation:miracle-presence 18s ease both}
+.vector-placement{position:absolute;width:clamp(175px,22vw,310px)}
+.vector-journey{width:100%;transform-origin:50% 85%}
+.vector-illustration{width:100%;height:auto;filter:drop-shadow(0 6px 8px #77635113);transform-origin:50% 75%}
+.placement-ground{left:12%;bottom:21%;width:clamp(165px,21vw,285px)}
+.placement-sky{left:58%;top:22%;width:clamp(170px,24vw,330px)}
+.placement-center{left:35%;top:34%;width:30%;max-width:310px}
+.placement-panorama{left:17%;top:20%;width:66%;max-width:850px}
+.visual-cat-arrival .vector-journey{animation:miracle-cat-arrive 18s ease-in-out both}
+.visual-cat-arrival .vector-illustration{animation:miracle-breathe 4.5s ease-in-out infinite}
+.visual-cat-stroll .vector-journey{animation:miracle-cat-stroll 18s ease-in-out both}
+.visual-cat-stroll .vector-illustration{animation:miracle-footstep 1.1s ease-in-out infinite}
+.visual-fox-turn .vector-journey{animation:miracle-fox-look 18s ease-in-out both}
+.visual-tanuki-peek .placement-ground{left:8%;bottom:26%}
+.visual-tanuki-peek .vector-journey{animation:miracle-tanuki-peek 18s ease-in-out both}
+.visual-rabbit-hop .vector-journey{animation:miracle-rabbit-visit 18s ease-in-out both}
+.visual-rabbit-hop .vector-illustration{animation:miracle-rabbit-hop 3s ease-in-out infinite}
+.visual-deer-arrival .vector-journey{animation:miracle-deer-visit 18s ease-in-out both}
+.visual-sparrow-flight .placement-sky{left:22%;top:36%;width:clamp(90px,12vw,170px)}
+.visual-sparrow-flight .vector-journey{animation:miracle-sparrow-path 14s ease-in-out infinite}
+.visual-sparrow-flight .vector-illustration{animation:miracle-wingbeat 1.4s ease-in-out infinite}
+.visual-firefly-glow .placement-panorama{top:36%}
+.visual-firefly-glow .vector-journey{animation:miracle-firefly-breath 5s ease-in-out infinite}
+.visual-rainbow-bloom .placement-panorama{top:19%;opacity:.8}
+.visual-rainbow-bloom .vector-journey{animation:miracle-rainbow-grow 18s ease-in-out both}
+.visual-sunbeam-sway .placement-panorama{top:17%;left:9%;width:82%;opacity:.8}
+.visual-sunbeam-sway .vector-journey{transform-origin:20% 0;animation:miracle-sunbeam-sway 12s ease-in-out infinite}
+.visual-snowfall .vector-journey{animation:miracle-snow-fall 12s linear infinite}
+.visual-first-snow .placement-panorama{top:24%;opacity:.85}
+.visual-first-snow .vector-journey{animation:miracle-first-snow 12s ease-in-out infinite}
+.visual-autumn-tint .placement-panorama{top:29%;left:2%;width:44%}
+.visual-autumn-tint .vector-journey{animation:miracle-branch-sway 8s ease-in-out infinite}
+.visual-leaf-whirl .vector-journey{animation:miracle-leaf-whirl 12s ease-in-out infinite}
+.visual-dew-shimmer .placement-ground{bottom:13%;left:74%;width:clamp(100px,14vw,190px)}
+.visual-dew-shimmer .vector-journey{animation:miracle-dew-glint 5s ease-in-out infinite}
+.visual-mote-drift .vector-journey{animation:miracle-motes-rise 12s ease-in-out infinite}
+.visual-moon-glow .placement-sky,.visual-crescent-rise .placement-sky,.visual-halo-breathe .placement-sky{top:18%;left:61%;width:clamp(140px,20vw,265px)}
+.visual-moon-glow .vector-journey{animation:miracle-moon-breath 9s ease-in-out infinite}
+.visual-crescent-rise .vector-journey{animation:miracle-crescent-rise 18s ease-out both}
+.visual-galaxy-drift .placement-panorama{top:17%;opacity:.8}
+.visual-galaxy-drift .vector-journey{animation:miracle-galaxy-drift 18s ease-in-out both}
+.visual-aurora-wave .placement-panorama{top:18%;width:86%;left:7%}
+.visual-aurora-wave .vector-journey{animation:miracle-aurora-wave 10s ease-in-out infinite}
+.visual-comet-pass .placement-sky{left:5%;top:18%;width:clamp(170px,25vw,320px)}
+.visual-comet-pass .vector-journey{animation:miracle-comet-pass 18s linear both}
+.visual-constellation-glow .placement-panorama{top:16%;left:24%;width:55%}
+.visual-constellation-glow .vector-journey{animation:miracle-constellation-breath 8s ease-in-out infinite}
+.visual-halo-breathe .vector-journey{animation:miracle-halo-breathe 9s ease-in-out infinite}
+.visual-cloud-drift .placement-sky{left:15%;top:21%;width:clamp(150px,19vw,250px)}
+.visual-cloud-drift .vector-journey{animation:miracle-cloud-drift 18s linear both}
+.visual-foxfire-drift .placement-ground{left:55%;bottom:28%;width:clamp(150px,20vw,260px)}
+.visual-foxfire-drift .vector-journey{animation:miracle-foxfire-float 8s ease-in-out infinite}
+.visual-torii-light .placement-center{opacity:.4}
+.visual-torii-light .vector-journey{animation:miracle-gate-breath 8s ease-in-out infinite}
+.visual-bell-sway .placement-center{top:32%;left:43%;width:14%;max-width:140px}
+.visual-bell-sway .vector-journey{transform-origin:50% 8%;animation:miracle-bell-sway 3s ease-in-out infinite}
+.visual-ema-light .placement-ground{left:22%;bottom:31%;width:clamp(95px,13vw,170px)}
+.visual-ema-light .vector-journey{transform-origin:50% 0;animation:miracle-ema-sway 6s ease-in-out infinite}
+.visual-wind-ribbon .placement-panorama{top:31%;width:80%;left:10%}
+.visual-wind-ribbon .vector-journey{animation:miracle-wind-ribbon 12s ease-in-out infinite}
+.visual-footprint-reveal .placement-center{top:48%;left:35%;width:30%;max-width:370px}
+.visual-footprint-reveal .vector-journey{animation:miracle-footprint-travel 18s ease-out both}
+.visual-tree-light .placement-ground,.visual-tree-flowering .placement-ground{left:3%;bottom:30%;width:clamp(160px,23vw,320px)}
+.visual-tree-light .vector-journey{animation:miracle-tree-light 7s ease-in-out infinite}
+.visual-feather-fall .placement-sky{left:65%;top:25%;width:clamp(100px,15vw,190px)}
+.visual-feather-fall .vector-journey{animation:miracle-feather-fall 18s ease-in-out both}
+.visual-sacred-fox .vector-journey{animation:miracle-white-fox 18s ease-in-out both}
+.visual-dragon-crossing .placement-panorama{top:10%;left:24%;width:52%;max-width:500px}
+.visual-dragon-crossing .vector-journey{animation:miracle-dragon-path 18s ease-in-out both}
+.visual-dragon-crossing .vector-illustration{animation:miracle-dragon-wave 7s ease-in-out infinite}
+.visual-phoenix-flight .placement-sky{left:28%;top:22%;width:clamp(220px,33vw,440px)}
+.visual-phoenix-flight .vector-journey{animation:miracle-phoenix-path 18s ease-in-out both}
+.visual-phoenix-flight .vector-illustration{transform-origin:50% 55%;animation:miracle-phoenix-wings 3.5s ease-in-out infinite}
+.visual-golden-butterfly .placement-sky{left:24%;top:37%;width:clamp(100px,14vw,180px)}
+.visual-golden-butterfly .vector-journey{animation:miracle-golden-butterfly 12s ease-in-out infinite}
+.visual-golden-butterfly .vector-illustration{animation:miracle-wingbeat 1.7s ease-in-out infinite}
+.visual-golden-wash .placement-panorama{left:4%;top:26%;width:92%}
+.visual-golden-wash .vector-journey{animation:miracle-golden-wash 18s ease-in-out both}
+.visual-rainbow-meteor .placement-sky{left:3%;top:19%;width:clamp(160px,24vw,300px)}
+.visual-rainbow-meteor .vector-journey{animation:miracle-rainbow-meteor 18s ease-in-out both}
+.visual-tree-flowering .vector-journey{animation:miracle-tree-blossom 18s ease-out both}
+.visual-heaven-gate .placement-panorama{left:20%;top:18%;width:60%;opacity:.75}
+.visual-heaven-gate .vector-journey{animation:miracle-heaven-gate 18s ease-in-out both}
+.miracle-particles{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.miracle-particles i{position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);border-radius:50%;background:#f6dfa7;opacity:.6;animation:miracle-particle-rise var(--duration) ease-in-out var(--delay) infinite}
+.particles-snow i{background:#fffaf1;box-shadow:0 0 3px #fff8e8;animation-name:miracle-particle-snow}
+.particles-leaves i{background:#d9ae85;width:calc(var(--size)*1.3);height:calc(var(--size)*2);border-radius:90% 5% 90% 5%;animation-name:miracle-particle-leaf}
+.particles-fireflies i{background:#e0e4a4;box-shadow:0 0 9px #edebbc;animation-name:miracle-firefly-wander}
+.particles-stars i{background:#f9ecc6;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation-name:miracle-star-twinkle}
+.particles-petals i{background:#eab9cb;width:calc(var(--size)*1.3);height:calc(var(--size)*1.8);border-radius:90% 0 90% 0;animation-name:miracle-particle-leaf}
+/* These touches change the existing scene instead of replacing it. */
+.shrine-illustration .shrine-torii,.shrine-illustration .shrine-trees{transition:filter 1.5s}
+[data-miracle="glowingTorii"] .shrine-torii{filter:drop-shadow(0 0 7px #fff2b8);animation:miracle-object-glow 6s ease-in-out infinite}
+[data-miracle="ringingBell"] .shrine-bell{transform-box:fill-box;transform-origin:50% 0;animation:miracle-bell-sway 3s ease-in-out infinite}
+[data-miracle="sacredTree"] .shrine-trees{filter:drop-shadow(0 0 9px #fbe8a9);animation:miracle-object-glow 7s ease-in-out infinite}
+[data-miracle="floweringTree"] .shrine-trees>g{fill:#f2c2d4;transition:fill 2s}
+[data-miracle="autumnLeaves"] .shrine-trees>g{fill:#deb28c;transition:fill 2s}
+[data-miracle="autumnLeaves"] .shrine-trees>g:nth-child(2n){fill:#cfa092}
+[data-miracle="goldenGround"]>.shrine-illustration{filter:sepia(.18) saturate(1.08);transition:filter 2s}
+.ambient-paused .vector-miracle *,.ambient-paused .shrine-illustration *{animation-play-state:paused!important}
+@keyframes miracle-presence{0%,100%{opacity:0}9%,87%{opacity:1}}
+@keyframes miracle-breathe{50%{transform:scale(1.01,1.025)}}
+@keyframes miracle-cat-arrive{0%{transform:translateX(-50px)}30%,75%{transform:translateX(0)}100%{transform:translateX(30px)}}
+@keyframes miracle-cat-stroll{0%{transform:translateX(-60px)}35%,65%{transform:translateX(10px)}100%{transform:translateX(75px)}}
+@keyframes miracle-footstep{0%,100%{transform:translateY(0) rotate(-.4deg)}50%{transform:translateY(-3px) rotate(.6deg)}}
+@keyframes miracle-fox-look{0%{transform:translateX(-35px)}35%,75%{transform:translateX(8px) rotate(-3deg)}55%{transform:translateX(8px) rotate(2deg)}100%{transform:translateX(40px)}}
+@keyframes miracle-tanuki-peek{0%,100%{transform:translate(-25px,20px) scale(.92)}25%,75%{transform:translate(0,0) scale(1)}50%{transform:rotate(-4deg)}}
+@keyframes miracle-rabbit-visit{0%{transform:translateX(-25px)}100%{transform:translateX(55px)}}
+@keyframes miracle-rabbit-hop{0%,30%,75%,100%{transform:translateY(0) scale(1)}42%{transform:translateY(2px) scale(1.02,.96)}55%{transform:translateY(-18px) scale(.98,1.02)}67%{transform:translateY(1px) scale(1.02,.98)}}
+@keyframes miracle-deer-visit{0%{transform:translateX(-35px);opacity:0}30%,80%{transform:translateX(0);opacity:1}100%{transform:translateX(18px);opacity:.5}}
+@keyframes miracle-sparrow-path{0%{transform:translate(-30px,22px)}25%{transform:translate(40px,-8px)}55%{transform:translate(80px,8px)}100%{transform:translate(130px,-35px)}}
+@keyframes miracle-wingbeat{50%{transform:scaleX(.78) scaleY(.97)}}
+@keyframes miracle-firefly-breath{0%,100%{opacity:.45;transform:translateY(4px)}50%{opacity:1;transform:translate(8px,-12px)}}
+@keyframes miracle-rainbow-grow{0%,100%{opacity:0;transform:scale(.97)}20%,80%{opacity:.9;transform:scale(1)}}
+@keyframes miracle-sunbeam-sway{50%{transform:rotate(3deg);opacity:.5}}
+@keyframes miracle-snow-fall{0%{transform:translate(0,-30px);opacity:.2}20%,80%{opacity:.9}100%{transform:translate(20px,70px);opacity:.2}}
+@keyframes miracle-first-snow{50%{transform:translate(9px,18px);opacity:.65}}
+@keyframes miracle-branch-sway{50%{transform:rotate(2deg) translateY(4px)}}
+@keyframes miracle-leaf-whirl{0%,100%{transform:translate(-15px,-7px) rotate(-5deg)}50%{transform:translate(27px,18px) rotate(6deg)}}
+@keyframes miracle-dew-glint{0%,100%{opacity:.6;transform:scale(.98)}50%{opacity:1;transform:scale(1.02)}}
+@keyframes miracle-motes-rise{0%,100%{transform:translate(0,15px);opacity:.5}50%{transform:translate(12px,-15px);opacity:.95}}
+@keyframes miracle-moon-breath{50%{transform:scale(1.025);opacity:.8}}
+@keyframes miracle-crescent-rise{0%{transform:translateY(30px);opacity:0}35%,85%{transform:translateY(0);opacity:1}100%{transform:translateY(-5px);opacity:.5}}
+@keyframes miracle-galaxy-drift{0%{transform:translate(-15px,10px)}100%{transform:translate(18px,-8px)}}
+@keyframes miracle-aurora-wave{0%,100%{transform:skewX(-4deg) scaleY(.93);opacity:.6}50%{transform:skewX(4deg) scaleY(1.04);opacity:.95}}
+@keyframes miracle-comet-pass{0%{transform:translate(-70px,-35px);opacity:0}10%,85%{opacity:1}100%{transform:translate(45vw,12vw);opacity:0}}
+@keyframes miracle-constellation-breath{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes miracle-halo-breathe{50%{transform:scale(1.06);opacity:.7}}
+@keyframes miracle-cloud-drift{0%{transform:translateX(-25px)}100%{transform:translateX(15vw)}}
+@keyframes miracle-foxfire-float{0%,100%{transform:translate(0,8px);opacity:.65}50%{transform:translate(16px,-13px);opacity:1}}
+@keyframes miracle-gate-breath{50%{opacity:.5;transform:scale(1.025)}}
+@keyframes miracle-bell-sway{0%,100%{transform:rotate(-7deg)}25%{transform:rotate(7deg)}50%{transform:rotate(-5deg)}75%{transform:rotate(4deg)}}
+@keyframes miracle-ema-sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg);opacity:.7}}
+@keyframes miracle-wind-ribbon{0%,100%{transform:translateX(-25px) skewY(-2deg);opacity:.5}50%{transform:translateX(25px) skewY(2deg);opacity:.9}}
+@keyframes miracle-footprint-travel{0%{opacity:0;transform:translateY(20px)}30%,80%{opacity:1;transform:translateY(0)}100%{opacity:.4;transform:translateY(-10px)}}
+@keyframes miracle-tree-light{50%{opacity:.7;transform:scale(1.015)}}
+@keyframes miracle-feather-fall{0%{transform:translate(-5px,-45px) rotate(-18deg)}35%{transform:translate(20px,5px) rotate(12deg)}65%{transform:translate(-10px,45px) rotate(-12deg)}100%{transform:translate(18px,90px) rotate(14deg)}}
+@keyframes miracle-white-fox{0%{transform:translateX(-25px);opacity:0}25%,80%{transform:translateX(0);opacity:1}50%{transform:translateY(2px) rotate(-2deg)}100%{transform:translateX(20px);opacity:.5}}
+@keyframes miracle-dragon-path{0%{transform:translate(-10vw,-15px);opacity:0}20%,80%{opacity:.9}100%{transform:translate(12vw,5px);opacity:0}}
+@keyframes miracle-dragon-wave{50%{transform:translateY(-12px) rotate(2deg)}}
+@keyframes miracle-phoenix-path{0%{transform:translate(-10px,25px);opacity:0}25%,80%{opacity:1}100%{transform:translate(35px,-30px);opacity:0}}
+@keyframes miracle-phoenix-wings{50%{transform:scaleX(.9) scaleY(1.03)}}
+@keyframes miracle-golden-butterfly{0%,100%{transform:translate(0,0) rotate(-7deg)}40%{transform:translate(55px,-35px) rotate(9deg)}70%{transform:translate(32px,-5px) rotate(-5deg)}}
+@keyframes miracle-golden-wash{0%,100%{opacity:0}30%,70%{opacity:.9}}
+@keyframes miracle-rainbow-meteor{0%,10%{transform:translate(-80px,-35px);opacity:0}18%,76%{opacity:1}90%,100%{transform:translate(50vw,13vw);opacity:0}}
+@keyframes miracle-tree-blossom{0%{opacity:0;transform:scale(.95)}40%,100%{opacity:1;transform:scale(1)}}
+@keyframes miracle-heaven-gate{0%,100%{opacity:0;transform:translateY(8px) scale(.97)}25%,75%{opacity:.9;transform:translateY(0) scale(1)}}
+@keyframes miracle-particle-rise{0%,100%{opacity:0;transform:translate(0,15px)}50%{opacity:.7;transform:translate(9px,-30px)}}
+@keyframes miracle-particle-snow{0%{opacity:0;transform:translate(-8px,-90px)}20%,80%{opacity:.85}100%{opacity:0;transform:translate(16px,120px)}}
+@keyframes miracle-particle-leaf{0%{opacity:0;transform:translate(-15px,-60px) rotate(-35deg)}20%,80%{opacity:.8}100%{opacity:0;transform:translate(30px,95px) rotate(110deg)}}
+@keyframes miracle-firefly-wander{0%,100%{opacity:.1;transform:translate(0,5px)}40%{opacity:.85;transform:translate(12px,-18px)}70%{opacity:.25;transform:translate(-8px,-4px)}}
+@keyframes miracle-star-twinkle{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:.9;transform:scale(1.1)}}
+@keyframes miracle-object-glow{50%{opacity:.8}}
+@media(max-width:760px){
+ .placement-ground{left:0;bottom:8%;width:35%;max-width:175px}
+ .placement-sky{left:54%;top:29%;width:44%}
+ .placement-panorama{left:4%;width:92%;top:27%}
+ .placement-center{left:26%;top:39%;width:48%}
+ .visual-tanuki-peek .placement-ground{left:2%;bottom:28%}
+ .visual-sparrow-flight .placement-sky{left:8%;top:34%;width:27%}
+ .visual-dew-shimmer .placement-ground{left:68%;bottom:23%;width:30%}
+ .visual-moon-glow .placement-sky,.visual-crescent-rise .placement-sky,.visual-halo-breathe .placement-sky{left:58%;top:27%;width:37%}
+ .visual-rainbow-bloom .placement-panorama{top:26%}
+ .visual-sunbeam-sway .placement-panorama{top:23%;left:2%;width:96%}
+ .visual-autumn-tint .placement-panorama{top:29%;width:63%;left:-6%}
+ .visual-galaxy-drift .placement-panorama,.visual-aurora-wave .placement-panorama{top:26%;left:0;width:100%}
+ .visual-comet-pass .placement-sky{left:0;top:28%;width:48%}
+ .visual-constellation-glow .placement-panorama{left:10%;width:80%;top:28%}
+ .visual-cloud-drift .placement-sky{left:8%;top:29%;width:39%}
+ .visual-foxfire-drift .placement-ground{left:54%;bottom:31%;width:43%}
+ .visual-bell-sway .placement-center{left:38%;top:42%;width:24%}
+ .visual-ema-light .placement-ground{left:11%;bottom:32%;width:30%}
+ .visual-footprint-reveal .placement-center{top:53%;left:23%;width:54%}
+ .visual-tree-light .placement-ground,.visual-tree-flowering .placement-ground{left:-2%;width:50%;bottom:35%}
+ .visual-feather-fall .placement-sky{left:61%;top:30%;width:33%}
+ .visual-dragon-crossing .placement-panorama{left:10%;top:15%;width:80%}
+ .encounter-dragon .encounter-caption{top:68px}
+ .encounter-dragon .encounter-caption>span{display:none}
+ .visual-phoenix-flight .placement-sky{left:18%;top:28%;width:64%}
+ .visual-golden-butterfly .placement-sky{left:21%;top:38%;width:32%}
+ .visual-rainbow-meteor .placement-sky{left:-2%;top:29%;width:49%}
+ .visual-heaven-gate .placement-panorama{left:10%;top:27%;width:80%}
+}
+@media(prefers-reduced-motion:reduce){
+ .vector-miracle,.vector-miracle *,.shrine-illustration .shrine-torii,.shrine-illustration .shrine-trees,.shrine-illustration .shrine-trees *,.shrine-illustration .shrine-bell{animation:none!important;transition:none!important}
+ .vector-miracle,.vector-miracle .vector-journey{opacity:1;transform:none}
+ .miracle-particles i{animation:none!important;opacity:.45;transform:none}
+}
+/* Fold the development controls to the right so ground visitors remain visible. */
+.encounter-preview:not([open]){left:auto;right:12px;width:auto;max-width:48%;font-size:9px}

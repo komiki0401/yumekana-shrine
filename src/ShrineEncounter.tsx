@@ -2,13 +2,15 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import type { Encounter, Spirit } from './store'
 import { id, localDate } from './store'
 import { encounterSettings, rollEncounter } from './encounters'
+import { VectorMiracle } from './VectorMiracle'
+import { vectorVisual } from './miracleVisuals'
 import { encounterImages } from './encounterImages'
 import { isAnimatedMiracle, miracleCatalog, rarityLabels } from './miracleCatalog'
 import type { AnimatedMiracleId } from './miracleCatalog'
 
 const EncounterPreview=import.meta.env.DEV?lazy(()=>import('./EncounterPreview')):null
 
-export function ShrineEncounter({spirit,paused,onEncounter}:{spirit:Spirit;paused:boolean;onEncounter:(entry:Encounter)=>void}){
+export function ShrineEncounter({spirit,paused,onEncounter,onVisualChange}:{spirit:Spirit;paused:boolean;onEncounter:(entry:Encounter)=>void;onVisualChange?:(kind:AnimatedMiracleId|null)=>void}){
  const [active,setActive]=useState<{entry:Encounter;preview:boolean}|null>(null)
  const latest=useRef({spirit,paused,onEncounter})
  const alive=useRef(false),busy=useRef(false),token=useRef(0)
@@ -39,12 +41,13 @@ export function ShrineEncounter({spirit,paused,onEncounter}:{spirit:Spirit;pause
   return()=>clearTimeout(timeout)
  },[active,paused,close])
  const kind=active?.entry.kind
+ useEffect(()=>{onVisualChange?.(kind&&isAnimatedMiracle(kind)?kind:null)},[kind,onVisualChange])
  const detail=miracleCatalog.find(item=>item.id===kind)
  const alias=kind==='deitySmile'?' encounter-miracle':kind==='lightButterfly'?' encounter-butterfly':''
  return <>
   {EncounterPreview&&<Suspense fallback={null}><EncounterPreview onPlay={id=>void play(id,true)} onClose={close}/></Suspense>}
   {active&&kind&&isAnimatedMiracle(kind)&&detail&&<div key={active.entry.id} className={'shrine-encounter encounter-'+kind+alias}>
-   {kind==='meteorShower'?<div className="meteor-lanes" aria-hidden="true">{[0,1,2,3,4].map(i=><img className="encounter-image meteor-star" key={i} src={encounterImages[kind]} alt="" draggable={false} style={{top:`${13+i*9}%`,animationDelay:`${i*.65}s`}}/>)}</div>:<div className="encounter-art encounter-image-art" aria-hidden="true"><img className="encounter-image" src={encounterImages[kind]} alt="" draggable={false}/></div>}
+   {vectorVisual(kind)?<VectorMiracle kind={kind}/>:kind==='meteorShower'?<div className="meteor-lanes" aria-hidden="true">{[0,1,2,3,4].map(i=><img className="encounter-image meteor-star" key={i} src={encounterImages[kind]} alt="" draggable={false} style={{top:`${13+i*9}%`,animationDelay:`${i*.65}s`}}/>)}</div>:<div className="encounter-art encounter-image-art" aria-hidden="true"><img className="encounter-image" src={encounterImages[kind]} alt="" draggable={false}/></div>}
    {['blossoms','deitySmile'].includes(kind)&&<div className="encounter-petals" aria-hidden="true">{Array.from({length:12},(_,i)=><i key={i} style={{left:`${i*8}%`,animationDelay:`-${i*.4}s`}}/>)}</div>}
    {kind==='lightButterfly'&&<div className="butterfly-sparkles" aria-hidden="true">✧　·　✧</div>}
    <div className="encounter-caption" role="status"><small className={'rarity-badge rarity-'+detail.rarity}>{detail.rarity} · {rarityLabels[detail.rarity]}{active.preview?' · 開発プレビュー':''}</small><b>{detail.title}</b><span>{detail.message}</span><button aria-label="特別演出を閉じる" onClick={close}>×</button></div>

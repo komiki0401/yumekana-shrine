@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" fill="none" stroke-linejoin="round" stroke-linecap="round"><defs>
+<linearGradient id="cream" x2=".8" y2="1"><stop stop-color="#fff9eb"/><stop offset="1" stop-color="#e9d8bb"/></linearGradient>
+<linearGradient id="gold" x2=".7" y2="1"><stop stop-color="#fff1bd"/><stop offset=".5" stop-color="#dfbc78"/><stop offset="1" stop-color="#b99058"/></linearGradient>
+<linearGradient id="pink" x2="1" y2="1"><stop stop-color="#fff0ee"/><stop offset="1" stop-color="#d9a5bd"/></linearGradient>
+<linearGradient id="mist" x2="1" y2="1"><stop stop-color="#d3ebe1"/><stop offset=".5" stop-color="#e3d9f2"/><stop offset="1" stop-color="#f5d8d9"/></linearGradient>
+<radialGradient id="halo"><stop stop-color="#fff7d4" stop-opacity=".8"/><stop offset=".55" stop-color="#f8e5b5" stop-opacity=".24"/><stop offset="1" stop-color="#fff3d1" stop-opacity="0"/></radialGradient>
+</defs><circle cx="240" cy="180" r="135" fill="url(#halo)"/><path d="M236 176Q192 76 126 114Q89 162 217 211Q132 176 143 246Q173 281 235 203M244 176Q288 76 354 114Q391 162 263 211Q348 176 337 246Q307 281 245 203" fill="url(#gold)" stroke="#d2b376" stroke-width="2"/>
+<path d="M236 173Q220 143 209 146M244 173Q260 143 271 146" fill="none" stroke="#b59664" stroke-width="3"/><ellipse cx="240" cy="192" rx="5" ry="33" fill="#bda070"/>
+<path d="M226 185L156 134M254 185L324 134M219 218L165 245M261 218L315 245" stroke="#fff3cf" stroke-width="3"/></svg>

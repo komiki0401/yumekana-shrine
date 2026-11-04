@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ArrowLeft, BookOpen } from 'lucide-react'
 import type { Encounter } from './store'
-import { miracleCatalog, rarityLabels, categoryLabels, isAnimatedMiracle } from './miracleCatalog'
+import { miracleCatalog, implementedMiracles, rarityLabels, categoryLabels, isAnimatedMiracle } from './miracleCatalog'
 import type { Rarity } from './miracleCatalog'
 import { firstDiscoveries } from './discoveries'
 import { encounterImages } from './encounterImages'
@@ -12,7 +12,7 @@ export function MiracleBook({entries,onBack}:{entries:Encounter[];onBack:()=>voi
  const visible=miracleCatalog.filter(item=>filter==='all'||item.rarity===filter)
  return <section className="miracle-book">
   <div className="book-overview"><BookOpen size={32}/><div><span>あなたが出会った、小さな奇跡</span><b>{discoveries.size} <small>/ {miracleCatalog.length}</small></b></div><button onClick={onBack}><ArrowLeft size={15}/>境内へ戻る</button></div>
-  <p className="book-note">現在、境内で出会える奇跡は10種類。これから少しずつ増えていきます。<br/>何度出会っても、最初の思い出は大切に残ります。</p>
+  <p className="book-note">境内で出会える奇跡は{implementedMiracles.length}種類。動物も、空の光も、そっとあなたを待っています。<br/>何度出会っても、最初の思い出は大切に残ります。</p>
   <div className="book-filters" role="group" aria-label="レアリティで絞り込む">{(['all','N','R','SR','SSR','UR'] as const).map(rarity=><button key={rarity} aria-pressed={filter===rarity} onClick={()=>setFilter(rarity)}>{rarity==='all'?'すべて':`${rarity}：${rarityLabels[rarity]}`}</button>)}</div>
   <div className="book-grid">{visible.map(item=>{
    const first=isAnimatedMiracle(item.id)?discoveries.get(item.id):undefined

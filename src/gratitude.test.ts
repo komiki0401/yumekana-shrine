@@ -61,9 +61,9 @@ describe('境内の特別演出',()=>{
   expect(encounterRate({gratitude:10000,expectation:10000})).toBe(.95)
   expect(rollEncounter({gratitude:10000,expectation:10000},()=>.999)).toBeNull()
  })
- it('0からでも実装済みの10種類すべてに出会える',()=>{
+ it('0からでも実装済みの50種類すべてに出会える',()=>{
   const weights=encounterWeights({gratitude:0,expectation:0})
-  expect(weights).toHaveLength(10)
+  expect(weights).toHaveLength(50)
   expect(weights.every(entry=>entry.weight>0)).toBe(true)
   expect(weights.reduce((sum,entry)=>sum+entry.weight,0)).toBeCloseTo(encounterRate({gratitude:0,expectation:0}))
   let start=0

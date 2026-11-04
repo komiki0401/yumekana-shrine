@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" fill="none" stroke-linejoin="round" stroke-linecap="round"><defs>
+<linearGradient id="cream" x2=".8" y2="1"><stop stop-color="#fff9eb"/><stop offset="1" stop-color="#e9d8bb"/></linearGradient>
+<linearGradient id="gold" x2=".7" y2="1"><stop stop-color="#fff1bd"/><stop offset=".5" stop-color="#dfbc78"/><stop offset="1" stop-color="#b99058"/></linearGradient>
+<linearGradient id="pink" x2="1" y2="1"><stop stop-color="#fff0ee"/><stop offset="1" stop-color="#d9a5bd"/></linearGradient>
+<linearGradient id="mist" x2="1" y2="1"><stop stop-color="#d3ebe1"/><stop offset=".5" stop-color="#e3d9f2"/><stop offset="1" stop-color="#f5d8d9"/></linearGradient>
+<radialGradient id="halo"><stop stop-color="#fff7d4" stop-opacity=".8"/><stop offset=".55" stop-color="#f8e5b5" stop-opacity=".24"/><stop offset="1" stop-color="#fff3d1" stop-opacity="0"/></radialGradient>
+</defs><g opacity=".6" fill="#f6eee2"><ellipse cx="98" cy="274" rx="76" ry="20"/><ellipse cx="370" cy="80" rx="70" ry="19"/></g>
+<path d="M56 245Q142 290 160 207Q166 127 237 153Q308 187 319 129Q329 76 378 126" stroke="#b9c9b1" stroke-width="43" fill="none" stroke-linecap="round"/>
+<path d="M57 247Q141 285 162 208Q168 138 238 163Q310 196 327 136Q335 99 369 127" stroke="#f4e8c7" stroke-width="17" fill="none" stroke-linecap="round"/>
+<path d="M95 257l8-28l17 18m35-39l-18-16l26-8m49-35l8-22l16 26m59 7l9 23l16-25m9-48l-17-18l26 1" fill="#d6ba7c"/>
+<path d="M358 119Q367 93 393 106L421 126L414 151L389 159L363 142Z" fill="#c6d1ba" stroke="#97ad96" stroke-width="2"/>
+<path d="M371 109L356 78L382 100M397 106L408 77L409 118" fill="#e0c38b"/>
+<path d="M384 130q8 6 15-2" stroke="#8c9e86" stroke-width="3" fill="none"/><path d="M412 145Q448 164 450 130M407 153Q445 189 452 164" stroke="#d9bd86" stroke-width="3" fill="none"/>
+<path d="M211 174L218 213L201 224m17-11l14 8M295 158L289 211L307 219m-18-8l-10 9" stroke="#b4c3a5" stroke-width="8" fill="none" stroke-linecap="round"/>
+<path d="M379 157l4 21l10-19" fill="#e6cb99"/></svg>

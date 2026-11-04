@@ -12,18 +12,19 @@ describe('奇跡図鑑',()=>{
   expect(miracleCatalog.map(x=>x.number)).toEqual(Array.from({length:50},(_,i)=>i+1))
   for(const category of ['animals','nature','sky','mystic','divine'])expect(miracleCatalog.filter(x=>x.category===category)).toHaveLength(10)
  })
- it('完成した10種類だけが画像と抽選対象を持つ',()=>{
-  expect(implementedMiracles).toHaveLength(10)
+ it('全50種類が画像と抽選対象を持ち、低い値でも出会える',()=>{
+  expect(implementedMiracles).toHaveLength(50)
   expect(Object.keys(encounterImages).sort()).toEqual(implementedMiracles.map(x=>x.id).sort())
   expect(new Set(implementedMiracles.map(x=>x.rarity)).size).toBe(5)
   for(const spirit of [{gratitude:0,expectation:0},{gratitude:100,expectation:100}]){
    const weights=encounterWeights(spirit)
-   expect(weights.every(x=>isAnimatedMiracle(x.kind))).toBe(true)
+   expect(weights).toHaveLength(50)
+   expect(weights.every(x=>isAnimatedMiracle(x.kind)&&x.weight>0)).toBe(true)
    expect(weights.reduce((s,x)=>s+x.weight,0)).toBeCloseTo(encounterRate(spirit))
   }
  })
- it('未実装の演出は保存・発見に入れない',()=>{
-  const d=empty(),entry={id:'pending',kind:'dragon' as const,date:'2026-11-02',createdAt:'2026-11-02T01:00:00Z'}
+ it('未知の演出IDは保存・発見に入れない',()=>{
+  const d=empty(),entry={id:'pending',kind:'unknown-miracle' as 'cat',date:'2026-11-02',createdAt:'2026-11-02T01:00:00Z'}
   expect(recordEncounter(d,entry)).toBe(d)
   expect(firstDiscoveries([entry]).size).toBe(0)
  })
@@ -63,4 +64,13 @@ it('将来の季節・時間帯条件を評価できる（現在の50種に限�
  expect(matchesMiracleConditions({season:'winter'},new Date(2026,3,1,12))).toBe(false)
  expect(matchesMiracleConditions({time:'night'},new Date(2026,3,1,22))).toBe(true)
  expect(miracleCatalog.every(item=>!('conditions' in item))).toBe(true)
+})
+
+it('全50種類の発見を保存・復元し、既存の記録も残す',()=>{
+ let d=empty()
+ for(const item of implementedMiracles)d=recordEncounter(d,{id:`found-${item.id}`,kind:item.id,date:'2026-11-04',createdAt:'2026-11-04T01:00:00Z'})
+ const restored=decode(JSON.stringify(d))
+ expect(firstDiscoveries(restored.encounters).size).toBe(50)
+ expect(restored.encounters).toEqual(d.encounters)
+ expect(recordEncounter(restored,restored.encounters[0])).toBe(restored)
 })
