@@ -4,6 +4,8 @@ import { isAnimatedMiracle, resolveMiracleId } from './miracleCatalog'
 import type { MiracleId } from './miracleCatalog'
 import type { DreamSuggestion } from './dreamCatalog'
 import { validYoshukuEma } from './yoshuku'
+import { audioDefaults } from './audioSettings'
+import type { AudioPreferences } from './audioSettings'
 import type { YoshukuEma } from './yoshuku'
 export type Dream = { id: string; suggestionId?: string; title: string; detail: string; createdAt: string; target: string; status: 'wishing' | 'fulfilled'; achievedAt?: string; message?: string; emaType?: 'normal' | 'yoshuku'; yoshuku?: YoshukuEma }
 export type Goal = { id: string; title: string; done: boolean }
@@ -13,11 +15,11 @@ export type Gratitude = { id: string; text: string; date: string; createdAt: str
 export type Spirit = { gratitude: number; expectation: number }
 export type EncounterKind = MiracleId | 'miracle'
 export type Encounter = { id: string; kind: EncounterKind; date: string; createdAt: string }
-export type Data = { version: 1; spiritCredits: {dreams:string[];gratitudes:string[];gratitudeDays:Record<string,number>}; gratitudes: Gratitude[]; spirit: Spirit; encounters: Encounter[]; dreams: Dream[]; dailyGoals: Record<string, Goal[]>; transactions: Transaction[]; fortunes: Record<string, Fortune>; settings: { id: string; sound: boolean; welcomed: boolean } }
+export type Data = { version: 1; spiritCredits: {dreams:string[];gratitudes:string[];gratitudeDays:Record<string,number>}; gratitudes: Gratitude[]; spirit: Spirit; encounters: Encounter[]; dreams: Dream[]; dailyGoals: Record<string, Goal[]>; transactions: Transaction[]; fortunes: Record<string, Fortune>; settings: { id: string; sound: boolean; welcomed: boolean } & Partial<AudioPreferences> }
 export const KEY = 'yumekana-shrine:v1'
 export const id = () => crypto.randomUUID()
 export const localDate = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-export const empty = (): Data => ({ version: 1, spiritCredits:{dreams:[],gratitudes:[],gratitudeDays:{}}, gratitudes: [], spirit: { gratitude: 0, expectation: 0 }, encounters: [], dreams: [], dailyGoals: {}, transactions: [], fortunes: {}, settings: { id: id(), sound: false, welcomed: false } })
+export const empty = (): Data => ({ version: 1, spiritCredits:{dreams:[],gratitudes:[],gratitudeDays:{}}, gratitudes: [], spirit: { gratitude: 0, expectation: 0 }, encounters: [], dreams: [], dailyGoals: {}, transactions: [], fortunes: {}, settings: { id: id(), sound: false, welcomed: false, ...audioDefaults } })
 export const balance = (d: Data) => d.transactions.reduce((n, t) => n + t.amount, 0)
 export function decode(raw: string): Data {
  const d = JSON.parse(raw)

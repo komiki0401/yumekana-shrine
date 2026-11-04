@@ -1,0 +1,32 @@
+夢叶神社 BGM「こもれびの願い」
+
+Original composition, arrangement and stereo production for Yumekana Shrine.
+96 seconds. D major pentatonic (D E F# A B), soft piano and flute,
+a quiet original plucked-string texture and synthesized air.
+No third-party song or field recording is included.
+
+Piano and flute instrument recordings:
+University of Iowa Musical Instrument Samples (MIS)
+Created by Lawrence Fritts, Director of the Electronic Music Studios,
+Professor of Composition, University of Iowa.
+
+Official source and permission:
+https://theremin.music.uiowa.edu/MIS.html
+https://theremin.music.uiowa.edu/MISpiano.html
+https://theremin.music.uiowa.edu/MISflute.html
+
+Permission stated on the official MIS page (checked 2026-11-04):
+"Since 1997, these recordings have been freely available on this website
+and may be downloaded and used for any projects, without restrictions."
+
+Samples used: Piano.pp D3 A3 B3 D4 E4 Gb4 A4 B4 D5 E5,
+and flute.nonvib.pp B3B4 / B4Bb5 chromatic scales.
+The instrument recordings remain credited to their original creator.
+The arrangement uses newly composed phrases; the downloaded recordings
+are individual instrument samples, not a pre-existing musical piece.
+
+Production source: scripts/render-shrine-bgm.py
+Source hashes and output metadata: komorebi-no-negai.json
+Encoding: MP3 128 kbps, stereo 44.1 kHz; nominal mastering target -22 LUFS.
+No paid music service, subscription, API key or external playback service
+is required. The app plays its own same-origin file only after a user action.

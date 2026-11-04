@@ -110,7 +110,8 @@ test('破損した保存データを上書きせずに起動できる', async ({
   await page.reload()
   await expect(page.getByRole('alert')).toContainText('元のデータは上書きしません')
   await page.getByRole('dialog').getByRole('button', { name: '閉じる' }).click()
-  await page.getByRole('button', { name: '音声を有効にする' }).click()
+  await page.getByRole('button', { name: '音の設定', exact: true }).click()
+  await page.getByRole('checkbox', { name: '効果音を有効にする' }).check()
   expect(await page.evaluate(() => localStorage.getItem('yumekana-shrine:v1'))).toBe('{broken')
 })
 

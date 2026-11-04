@@ -1,0 +1,35 @@
+{
+  "title": "こもれびの願い",
+  "durationSeconds": 96,
+  "sampleRate": 44100,
+  "source": "https://theremin.music.uiowa.edu/MIS.html",
+  "permissionQuote": "may be downloaded and used for any projects, without restrictions",
+  "sampleSha256": {
+    "Piano.pp.D3.aiff": "7aece11b1972eb60bdd3d9ff1719f5120bf13e63f056c3acc6c0bb78187961c2",
+    "Piano.pp.A3.aiff": "f303ec812c5ef76ed682af574746cea79fa8187229fb735233b0ee852d570b72",
+    "Piano.pp.B3.aiff": "ce1c8b3c1a4b3619052a7d235ed2a4f5175eeb4fef787cb401f72121897da9f4",
+    "Piano.pp.D4.aiff": "e84dc5003c0341e56518334ca7afdaf2f0831affc29095b39a99d58cc322e7f7",
+    "Piano.pp.E4.aiff": "3dfb2e26042b3c3352dd0d2911ac37ec9506dc42941cc7d9c89b345bc024e03c",
+    "Piano.pp.Gb4.aiff": "ec2c76e9b1a1d303b4c2f81c977532a78d1dd64ebbd91346c26b45a07ead8b7d",
+    "Piano.pp.A4.aiff": "86d6230bfd83be9a0cbf896ca4eed2426a10a4c94909a7377c65419130e23ee1",
+    "Piano.pp.B4.aiff": "d7eeac8cf49be7dafb3b15cad5709b158bce7e0f279158cdac16d7dc6efec01d",
+    "Piano.pp.D5.aiff": "d739882608035d629810c010014894e279da254f73d8e13e4f02c698d7a2d219",
+    "Piano.pp.E5.aiff": "088aa62ec98beb251fa89483bc1b6336b7aa2a5575f6aa2a0bc5700f17f1f1a3",
+    "flute.nonvib.pp.B3B4.aiff": "663f133c3f260c47ebae6cc7e5c4e7bacec047664cf68f76ab2a4bcf109dc2a3",
+    "flute.nonvib.pp.B4Bb5.aiff": "c0090e167a4480a0782c1891691bcf9619b5af659cedd1199dc0947381213b17"
+  },
+  "mastering": {
+    "input_i": "-19.07",
+    "input_tp": "-3.74",
+    "input_lra": "5.80",
+    "input_thresh": "-29.82",
+    "output_i": "-22.33",
+    "output_tp": "-6.85",
+    "output_lra": "5.60",
+    "output_thresh": "-33.05",
+    "normalization_type": "dynamic",
+    "target_offset": "0.33"
+  },
+  "mp3Bytes": 1537060,
+  "mp3Sha256": "4bcc1b5b50ff361b23e0524bf1e0a71a846409430d631199d16b11c76f4ebd3e"
+}
