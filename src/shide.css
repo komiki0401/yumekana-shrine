@@ -1,0 +1,51 @@
+/* Each original sway is 2.5x faster, followed by a still interval.
+   Shared 8s cycles + small delays keep a ~5s calm gap across all eight papers.
+   Original periods: 5/5.7/6.4/7.1s (shrine), 4.8/5.4/6/6.6s (torii). */
+@keyframes shide-gust-0 {
+  0%, 25%, 100% { transform: rotate(0deg) skewX(0deg); }
+  8.75% { transform: rotate(8deg) skewX(3deg); }
+  17.5% { transform: rotate(-8deg) skewX(-3deg); }
+  22% { transform: rotate(2deg) skewX(1deg); }
+}
+@keyframes shide-gust-1 {
+  0%, 28.5%, 100% { transform: rotate(0deg) skewX(0deg); }
+  9.975% { transform: rotate(8deg) skewX(3deg); }
+  19.95% { transform: rotate(-8deg) skewX(-3deg); }
+  25.08% { transform: rotate(2deg) skewX(1deg); }
+}
+@keyframes shide-gust-2 {
+  0%, 32%, 100% { transform: rotate(0deg) skewX(0deg); }
+  11.2% { transform: rotate(8deg) skewX(3deg); }
+  22.4% { transform: rotate(-8deg) skewX(-3deg); }
+  28.16% { transform: rotate(2deg) skewX(1deg); }
+}
+@keyframes shide-gust-3 {
+  0%, 35.5%, 100% { transform: rotate(0deg) skewX(0deg); }
+  12.425% { transform: rotate(8deg) skewX(3deg); }
+  24.85% { transform: rotate(-8deg) skewX(-3deg); }
+  31.24% { transform: rotate(2deg) skewX(1deg); }
+}
+@keyframes shide-gust-4 {
+  0%, 24%, 100% { transform: rotate(0deg) skewX(0deg); }
+  8.4% { transform: rotate(8deg) skewX(3deg); }
+  16.8% { transform: rotate(-8deg) skewX(-3deg); }
+  21.12% { transform: rotate(2deg) skewX(1deg); }
+}
+@keyframes shide-gust-5 {
+  0%, 27%, 100% { transform: rotate(0deg) skewX(0deg); }
+  9.45% { transform: rotate(8deg) skewX(3deg); }
+  18.9% { transform: rotate(-8deg) skewX(-3deg); }
+  23.76% { transform: rotate(2deg) skewX(1deg); }
+}
+@keyframes shide-gust-6 {
+  0%, 30%, 100% { transform: rotate(0deg) skewX(0deg); }
+  10.5% { transform: rotate(8deg) skewX(3deg); }
+  21% { transform: rotate(-8deg) skewX(-3deg); }
+  26.4% { transform: rotate(2deg) skewX(1deg); }
+}
+@keyframes shide-gust-7 {
+  0%, 33%, 100% { transform: rotate(0deg) skewX(0deg); }
+  11.55% { transform: rotate(8deg) skewX(3deg); }
+  23.1% { transform: rotate(-8deg) skewX(-3deg); }
+  29.04% { transform: rotate(2deg) skewX(1deg); }
+}
