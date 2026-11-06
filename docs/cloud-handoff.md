@@ -34,6 +34,8 @@ npm run dev -- --host 0.0.0.0 --port 5173 --strictPort
 
 - BGM：オリジナル96秒ループ「こもれびの願い」。初期OFF、効果音と独立した音量・設定保存・非表示時停止。音源とクレジットは public/audio/、制作と再生の説明は [BGMの説明](bgm.md)。通常起動・ビルドで音源制作は不要です。
 
+- 境内の成長：感謝度＋期待度の合計0・15・50で3段階の外観。既存データから導出し、新たなポイント管理は不要。[成長の説明](shrine-growth.md) を参照。
+
 ## 検証と公開
 
 ```sh
@@ -43,7 +45,7 @@ npx playwright install --with-deps chromium
 npm run test:e2e
 ```
 
-現在の検証は単体・Node合計82件、通常ブラウザ160件成功。予祝APIスタブの4件も別コマンド・GitHub Actionsで実行します。Playwrightは個人のブラウザと別のテスト環境で動作する。
+現在の検証は単体・Node合計86件、通常ブラウザ168件成功。予祝APIスタブの4件も別コマンド・GitHub Actionsで実行します。Playwrightは個人のブラウザと別のテスト環境で動作する。
 環境に既存Chromiumがある場合は `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` で実際の実行ファイルを指定できる。
 ブラウザ依存のインストールに管理権限が必要な場合は、クラウド環境のセットアップ機能を利用する。
 
